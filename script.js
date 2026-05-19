@@ -93,10 +93,10 @@ function toggleRegex() {
 
   if (isRegexMode) {
     switchBg.classList.add('active');
-    display.textContent = '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/';
+    display.textContent = '(1 + 0)* 1* 0* (101 + 01 + 000) (1 + 0)* (101 + 00)* (111 + 00 + 101) (1 + 0)*';
   } else {
     switchBg.classList.remove('active');
-    display.textContent = '/^[a-zA-Z0-9_]+$/';
+    display.textContent = '(bab + bbb) a* b* (a* + b*) (ba)* (aba) (bab + aba)* bb (a + b)* (bab + aba) (a+b)*';
   }
 }
 

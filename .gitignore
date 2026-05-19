@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+.venv-1
+venv/
+ENV/
+env/
+.python-version
+
+# Flask / local environment
+instance/
+.webassets-cache
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Editor files
+*.swp
+*.swo
+*~
