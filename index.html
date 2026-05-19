@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vintage TV Layout</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- TV Body -->
+  <div id="tv-container" class="tv-body">
+    
+    <!-- Decorative antenna -->
+    <div class="antenna">
+      <div class="antenna-rod antenna-rod-left"></div>
+      <div class="antenna-rod antenna-rod-right"></div>
+    </div>
+
+    <!-- Left Column: Screen & Channels & RegEx Display -->
+    <div class="left-column">
+      <div class="screen-container">
+        <!-- Screen -->
+        <div class="screen">
+          
+          <!-- Static Channel -->
+          <div id="channel-static" class="channel">
+            <div id="static-noise" class="static-noise"></div>
+            <div class="channel-content">
+              <p class="no-signal-text">NO SIGNAL</p>
+            </div>
+          </div>
+
+          <!-- Color Bars Channel -->
+          <div id="channel-color-bars" class="channel color-bars hidden">
+            <div class="color-bar bar-white"></div>
+            <div class="color-bar bar-yellow"></div>
+            <div class="color-bar bar-cyan"></div>
+            <div class="color-bar bar-green"></div>
+            <div class="color-bar bar-pink"></div>
+            <div class="color-bar bar-red"></div>
+            <div class="color-bar bar-blue"></div>
+          </div>
+
+          <!-- Retro Pattern Channel -->
+          <div id="channel-retro-pattern" class="channel retro-pattern hidden">
+            <div id="retro-waves" class="retro-waves"></div>
+            <div class="channel-content">
+              <!-- Waves Icon -->
+              <svg class="waves-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 6c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/>
+                <path d="M2 12c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/>
+                <path d="M2 18c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Screen scan line effect -->
+          <div class="screen-scanlines"></div>
+          <!-- Screen vignette -->
+          <div class="screen-vignette"></div>
+        </div>
+
+        <!-- Channel Buttons -->
+        <div class="channel-buttons">
+          <button id="btn-ch1" onclick="setChannel('static')" class="ch-btn ch-btn-active">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+            CH 1
+          </button>
+          <button id="btn-ch2" onclick="setChannel('color-bars')" class="ch-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+            CH 2
+          </button>
+          <button id="btn-ch3" onclick="setChannel('retro-pattern')" class="ch-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/><path d="M2 12c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/><path d="M2 18c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/></svg>
+            CH 3
+          </button>
+        </div>
+      </div>
+
+      <!-- Current RegEx Display -->
+      <div class="regex-display-container">
+        <h3 class="regex-label">
+          <span class="regex-indicator"></span>
+          Active RegEx
+        </h3>
+        <div class="regex-value-box">
+          <code id="regex-display">/^[a-zA-Z0-9_]+$/</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Inputs & Controls -->
+    <div class="right-column">
+      
+      <!-- Input Fields Section -->
+      <div class="inputs-section">
+        <div id="inputs-container">
+          <!-- JavaScript will populate these -->
+        </div>
+      </div>
+
+      <!-- Bottom Controls -->
+      <div class="controls-section">
+        <!-- RegEx Switch -->
+        <div class="switch-container">
+          <label class="switch-label">Change RegEx</label>
+          <button id="regex-switch" onclick="toggleRegex()" class="regex-switch">
+            <div id="regex-knob" class="regex-knob"></div>
+          </button>
+        </div>
+
+        <!-- Validate Button -->
+        <button onclick="handleValidate()" class="validate-btn">
+          VALIDATE
+        </button>
+      </div>
+    </div>
+
+    <!-- Decorative Speaker Grills -->
+    <div id="speaker-grills" class="speaker-grills">
+      <!-- JavaScript will populate these -->
+    </div>
+  </div>
+
+  <!-- Shadow underneath TV -->
+  <div class="tv-shadow"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
