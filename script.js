@@ -1,112 +1,92 @@
-// --- State ---
-let isRegexMode = false;
-let currentChannel = 'static';
-
-// --- Initialize DOM generation dynamically ---
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Generate Static Noise
-  const staticContainer = document.getElementById('static-noise');
-  for (let i = 0; i < 60; i++) {
-    const dot = document.createElement('div');
-    dot.style.position = 'absolute';
-    dot.style.backgroundColor = 'white';
-    dot.style.width = (Math.random() * 3) + 'px';
-    dot.style.height = (Math.random() * 3) + 'px';
-    dot.style.left = (Math.random() * 100) + '%';
-    dot.style.top = (Math.random() * 100) + '%';
-    dot.style.animation = `flicker ${Math.random() * 0.3 + 0.1}s infinite`;
-    staticContainer.appendChild(dot);
-  }
 
-  // 2. Generate Retro Waves
-  const wavesContainer = document.getElementById('retro-waves');
-  for (let i = 0; i < 12; i++) {
-    const wave = document.createElement('div');
-    wave.style.position = 'absolute';
-    wave.style.width = '100%';
-    wave.style.height = '128px';
-    wave.style.background = 'linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent)';
-    wave.style.top = `${i * 40}px`;
-    wave.style.animation = `wave ${3 + i * 0.5}s ease-in-out infinite`;
-    wave.style.animationDelay = `${i * 0.2}s`;
-    wavesContainer.appendChild(wave);
-  }
+  // --- Initial States and Regex Logic ---
+  let currentMachine = 'DFA';
+  let isRegexMode = false;
+  let selectedInput = 1;
 
-  // 3. Generate 5 Input Fields
-  const inputsContainer = document.getElementById('inputs-container');
-  for (let i = 1; i <= 5; i++) {
-    const fieldHTML = `
-      <div style="display: flex; align-items: center; gap: 1rem;">
-        <label style="color: #c5dce9; min-width: 80px; font-size: 1.125rem; font-weight: bold;">Input ${i}:</label>
-        <input type="text" id="field${i}" class="input-field" placeholder="Enter value ${i}" style="flex: 1;">
-      </div>
-    `;
-    inputsContainer.insertAdjacentHTML('beforeend', fieldHTML);
-  }
+  const REGEX_OFF = '(bab + bbb) a* b* (a* + b*) (ba)* (aba) (bab + aba)* bb (a + b)* (bab + aba) (a+b)';
+  const REGEX_ON = '(1 + 0)* 1* 0* (101 + 01 + 000) (1 + 0)* (101 + 00)* (111 + 00 + 101) (1 + 0)';
 
-  // 4. Generate Speaker Grills
-  const speakerContainer = document.getElementById('speaker-grills');
+  // --- Setup DOM Elements ---
+  const screenDisplay = document.getElementById('screen-display');
+  const dfaBtn = document.getElementById('btn-dfa');
+  const cfgBtn = document.getElementById('btn-cfg');
+  const pdaBtn = document.getElementById('btn-pda');
+  
+  const regexSwitch = document.getElementById('regex-switch');
+  const regexDisplay = document.getElementById('regex-display');
+  
+  const radios = document.querySelectorAll('.radio-btn');
+  const validateBtn = document.getElementById('validate-btn');
+  const speakerGrillsContainer = document.getElementById('speaker-grills');
+
+
+  // --- Generate 14 Decorative Grills Dynamically ---
   for (let i = 0; i < 14; i++) {
     const grill = document.createElement('div');
-    grill.className = 'speaker-grill';
-    speakerContainer.appendChild(grill);
+    grill.className = 'grill';
+    speakerGrillsContainer.appendChild(grill);
   }
-});
 
 
-// --- Functions ---
+  // --- Handle Screen / Machine Mode Swap ---
+  function updateMachineSelection(machine) {
+    currentMachine = machine;
+    screenDisplay.textContent = `${machine} Placeholder Screen`;
 
-function setChannel(channel) {
-  currentChannel = channel;
-  
-  // Hide all screens
-  document.getElementById('channel-static').classList.add('hidden');
-  document.getElementById('channel-color-bars').classList.add('hidden');
-  document.getElementById('channel-retro-pattern').classList.add('hidden');
-  
-  // Show active screen
-  document.getElementById(`channel-${channel}`).classList.remove('hidden');
+    // Apply Active/Inactive Classes to the Machine Buttons
+    dfaBtn.className = machine === 'DFA' ? 'btn-machine active' : 'btn-machine inactive';
+    cfgBtn.className = machine === 'CFG' ? 'btn-machine active' : 'btn-machine inactive';
+    pdaBtn.className = machine === 'PDA' ? 'btn-machine active' : 'btn-machine inactive';
+  }
 
-  // Update button styles
-  const btnMap = {
-    'static': document.getElementById('btn-ch1'),
-    'color-bars': document.getElementById('btn-ch2'),
-    'retro-pattern': document.getElementById('btn-ch3')
-  };
+  dfaBtn.addEventListener('click', () => updateMachineSelection('DFA'));
+  cfgBtn.addEventListener('click', () => updateMachineSelection('CFG'));
+  pdaBtn.addEventListener('click', () => updateMachineSelection('PDA'));
 
-  // Apply classes accordingly
-  Object.keys(btnMap).forEach(key => {
-    if (key === channel) {
-      btnMap[key].classList.add('ch-btn-active');
+
+  // --- Handle Active Regex Switch ---
+  regexSwitch.addEventListener('click', () => {
+    isRegexMode = !isRegexMode;
+
+    if (isRegexMode) {
+      regexSwitch.classList.remove('off');
+      regexSwitch.classList.add('on');
+      regexDisplay.textContent = REGEX_ON;
     } else {
-      btnMap[key].classList.remove('ch-btn-active');
+      regexSwitch.classList.remove('on');
+      regexSwitch.classList.add('off');
+      regexDisplay.textContent = REGEX_OFF;
     }
   });
-}
 
-function toggleRegex() {
-  isRegexMode = !isRegexMode;
-  
-  const switchBg = document.getElementById('regex-switch');
-  const knob = document.getElementById('regex-knob');
-  const display = document.getElementById('regex-display');
 
-  if (isRegexMode) {
-    switchBg.classList.add('active');
-    display.textContent = '(1 + 0)* 1* 0* (101 + 01 + 000) (1 + 0)* (101 + 00)* (111 + 00 + 101) (1 + 0)*';
-  } else {
-    switchBg.classList.remove('active');
-    display.textContent = '(bab + bbb) a* b* (a* + b*) (ba)* (aba) (bab + aba)* bb (a + b)* (bab + aba) (a+b)*';
-  }
-}
+  // --- Handle Custom Pill Radio Buttons ---
+  radios.forEach(radio => {
+    radio.addEventListener('click', () => {
+      selectedInput = parseInt(radio.getAttribute('data-val'));
+      
+      radios.forEach(r => {
+        if (parseInt(r.getAttribute('data-val')) === selectedInput) {
+          r.className = 'radio-btn active';
+        } else {
+          r.className = 'radio-btn inactive';
+        }
+      });
+    });
+  });
 
-function handleValidate() {
-  const formData = {};
-  for (let i = 1; i <= 5; i++) {
-    const input = document.getElementById(`field${i}`);
-    formData[`field${i}`] = input.value;
-  }
-  
-  console.log('Validating:', formData);
-  alert(`Data validated!\nActive RegEx: ${document.getElementById('regex-display').textContent}\nCheck console for form values.`);
-}
+
+  // --- Handle Validate Click Event ---
+  validateBtn.addEventListener('click', () => {
+    const formData = {};
+    for (let i = 1; i <= 5; i++) {
+      formData[`field${i}`] = document.getElementById(`input-${i}`).value;
+    }
+    
+    console.log('Validating Request Payload:', formData, '| Target Input:', selectedInput);
+    alert(`Data validated for Input ${selectedInput}!\nCheck your browser's console for form values.`);
+  });
+
+});
