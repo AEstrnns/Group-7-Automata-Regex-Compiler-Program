@@ -24,52 +24,6 @@
             DFA Placeholder Screen
           </div>
 
-          <!-- Color Bars Channel -->
-          <div id="channel-color-bars" class="channel color-bars hidden">
-            <div class="color-bar bar-white"></div>
-            <div class="color-bar bar-yellow"></div>
-            <div class="color-bar bar-cyan"></div>
-            <div class="color-bar bar-green"></div>
-            <div class="color-bar bar-pink"></div>
-            <div class="color-bar bar-red"></div>
-            <div class="color-bar bar-blue"></div>
-          </div>
-
-          <!-- Retro Pattern Channel -->
-          <div id="channel-retro-pattern" class="channel retro-pattern hidden">
-            <div id="retro-waves" class="retro-waves"></div>
-            <div class="channel-content">
-              <!-- Waves Icon -->
-              <svg class="waves-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 6c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/>
-                <path d="M2 12c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/>
-                <path d="M2 18c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/>
-              </svg>
-            </div>
-          </div>
-
-          <!-- Screen scan line effect -->
-          <div class="screen-scanlines"></div>
-          <!-- Screen vignette -->
-          <div class="screen-vignette"></div>
-        </div>
-
-        <!-- Channel Buttons -->
-        <div class="channel-buttons">
-          <button id="btn-ch1" onclick="setChannel('static')" class="ch-btn ch-btn-active">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-            DFA
-          </button>
-          <button id="btn-ch2" onclick="setChannel('color-bars')" class="ch-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-            CFG
-          </button>
-          <button id="btn-ch3" onclick="setChannel('retro-pattern')" class="ch-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/><path d="M2 12c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/><path d="M2 18c.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6.6 0 1.2-.2 1.8-.6.5-.4 1.2-.4 1.8 0 .6.4 1.2.6 1.8.6"/></svg>
-            PDA
-          </button>
-        </div>
-      </div>
           <!-- Machine Type Buttons -->
           <div class="machine-buttons">
             <button id="btn-dfa" class="btn-machine active">
@@ -94,7 +48,7 @@
           </div>
           <div class="regex-code-wrapper">
             <code id="regex-display" class="regex-code">
-              (bab + bbb) a* b* (a* + b*) (ba)* (aba) (bab + aba)* bb (a + b)* (bab + aba) (a+b)
+              (bab + bbb) a *b* (a *+ b*) (ba) *(aba) (bab + aba)* bb (a + b)* (bab + aba) (a+b)
             </code>
           </div>
         </div>
