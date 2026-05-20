@@ -5,26 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Group 7-Automata Program</title>
   <link rel="stylesheet" href="styles.css">
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 <body>
 
-  <!-- Main TV Wrapper Container -->
   <div class="tv-wrapper">
     
-    <!-- Top Section Grid (Screen+Regex Left, Inputs Right) -->
     <div class="top-grid">
       
-      <!-- Left Column (Screen & Active Regex) -->
       <div class="left-column">
         
-        <!-- Screen Panel -->
         <div class="panel screen-panel">
-          <!-- Black Screen -->
-          <div id="screen-display" class="screen-display">
-            DFA Placeholder Screen
+          <div class="screen-container">
+            <div id="screen-display" class="screen-display"></div>
           </div>
 
-          <!-- Machine Type Buttons -->
           <div class="machine-buttons">
             <button id="btn-dfa" class="btn-machine active">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
@@ -41,36 +36,31 @@
           </div>
         </div>
 
-        <!-- Active Regex Panel -->
         <div class="panel regex-panel">
           <div class="regex-label">
             <span class="regex-dot"></span> Active Regex
           </div>
           <div class="regex-code-wrapper">
-            <code id="regex-display" class="regex-code">
-              (bab + bbb) a *b* (a *+ b*) (ba) *(aba) (bab + aba)* bb (a + b)* (bab + aba) (a+b)
-            </code>
+            <code id="regex-display" class="regex-code">(bab + bbb) a* b* (a* + b*) (ba)* (aba) (bab + aba)* bb (a + b)* (bab + aba) (a+b)*</code>
           </div>
         </div>
 
       </div>
 
-      <!-- Right Column (Inputs Panel) -->
       <div class="panel right-column">
-        <!-- Generate 5 inputs -->
-        <div class="input-row"><label class="input-label">Input 1:</label><input id="input-1" class="input-field" type="text" placeholder="Enter value 1"></div>
-        <div class="input-row"><label class="input-label">Input 2:</label><input id="input-2" class="input-field" type="text" placeholder="Enter value 2"></div>
-        <div class="input-row"><label class="input-label">Input 3:</label><input id="input-3" class="input-field" type="text" placeholder="Enter value 3"></div>
-        <div class="input-row"><label class="input-label">Input 4:</label><input id="input-4" class="input-field" type="text" placeholder="Enter value 4"></div>
-        <div class="input-row"><label class="input-label">Input 5:</label><input id="input-5" class="input-field" type="text" placeholder="Enter value 5"></div>
+        <div class="input-row"><label class="input-label">Input 1:</label><input id="input-1" class="input-field" type="text" placeholder="Enter value 1"><div class="indicator-light"></div></div>
+        <div class="input-row"><label class="input-label">Input 2:</label><input id="input-2" class="input-field" type="text" placeholder="Enter value 2"><div class="indicator-light"></div></div>
+        <div class="input-row"><label class="input-label">Input 3:</label><input id="input-3" class="input-field" type="text" placeholder="Enter value 3"><div class="indicator-light"></div></div>
+        <div class="input-row"><label class="input-label">Input 4:</label><input id="input-4" class="input-field" type="text" placeholder="Enter value 4"><div class="indicator-light"></div></div>
+        <div class="input-row"><label class="input-label">Input 5:</label><input id="input-5" class="input-field" type="text" placeholder="Enter value 5"><div class="indicator-light"></div></div>
+        
+        <button id="validate-btn" class="action-btn validate-btn">VALIDATE</button>
       </div>
 
     </div>
 
-    <!-- Bottom Section (Controls) -->
     <div class="panel bottom-controls">
       
-      <!-- Left: Change Regex Toggle -->
       <div class="control-group">
         <span class="control-title">Change Regex</span>
         <button id="regex-switch" class="toggle-switch off">
@@ -78,9 +68,8 @@
         </button>
       </div>
 
-      <!-- Middle: Choose Input Radios -->
       <div class="control-group control-group-center">
-        <span class="control-title">Choose Input to Validate</span>
+        <span class="control-title">Choose Input to Simulate</span>
         <div class="radio-container">
           <button class="radio-btn active" data-val="1">
             <div class="radio-circle"><div class="radio-inner-circle"></div></div>
@@ -105,15 +94,11 @@
         </div>
       </div>
 
-      <!-- Right: Validate Button -->
-      <button id="validate-btn" class="validate-btn">Validate</button>
+      <button id="simulate-btn" class="action-btn simulate-btn">SIMULATE</button>
 
     </div>
 
-    <!-- Decorative Speaker Grills -->
-    <div id="speaker-grills" class="speaker-grills">
-      <!-- Generated via JS for cleaner HTML file -->
-    </div>
+    <div id="speaker-grills" class="speaker-grills"></div>
 
   </div>
 
