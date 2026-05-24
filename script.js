@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // =====================================================================
-  // DFA 2: REGEX ON (0, 1) - AS PER BLUEPRINT
+  // DFA 2: REGEX ON (0, 1)
   // =====================================================================
   const dfaOnTransitions = {
     'Start2':   { '0': 'e2', '1': 'e1', },
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'Accept2':  { '0': 'Accept2', '1': 'Accept2' }
   };
 
-  // --- Dynamic Visual Topology Builder ---
+    // --- DFA Builder ---
   function drawDFA() {
     const loopSmooth = { type: 'curvedCW', roundness: 0.5 };
     
@@ -218,6 +218,243 @@ document.addEventListener('DOMContentLoaded', () => {
     network = new vis.Network(screenDisplay, data, options);
   }
 
+  // =====================================================================
+  // CFG
+  // =====================================================================
+  function drawCFG() {
+  // =====================================================================
+  // CFG 1: REGEX OFF (a, b)
+  // =====================================================================
+    const cfgOffHtml = `
+      <div id="rule-S" class="cfg-rule">S -> Q R T U V aba W bb X Y X</div>
+      <div id="rule-Q" class="cfg-rule">Q -> bab | bbb</div>
+      <div id="rule-R" class="cfg-rule">R -> aR | ^</div>
+      <div id="rule-T" class="cfg-rule">T -> bT | ^</div>
+      <div id="rule-U" class="cfg-rule">U -> R | T</div>
+      <div id="rule-V" class="cfg-rule">V -> baV | ^</div>
+      <div id="rule-W" class="cfg-rule">W -> babW | abaW | ^</div>
+      <div id="rule-X" class="cfg-rule">X -> aX | bX | ^</div>
+      <div id="rule-Y" class="cfg-rule">Y -> bab | aba</div>
+    `;
+
+  // =====================================================================
+  // CFG 2: REGEX ON (0, 1)
+  // =====================================================================
+    const cfgOnHtml = `
+      <div id="rule-S" class="cfg-rule">S -> Q R T U Q V W Q</div>
+      <div id="rule-Q" class="cfg-rule">Q -> 1Q | 0Q | ^</div>
+      <div id="rule-R" class="cfg-rule">R -> 1R | ^</div>
+      <div id="rule-T" class="cfg-rule">T -> 0T | ^</div>
+      <div id="rule-U" class="cfg-rule">U -> 101 | 01 | 000</div>
+      <div id="rule-V" class="cfg-rule">V -> 101V | 00V | ^</div>
+      <div id="rule-W" class="cfg-rule">W -> 111 | 00 | 101</div>
+    `;
+
+    screenDisplay.innerHTML = `
+      <div id="cfg-wrapper" style="width:100%; height:100%; display:flex; flex-direction:column; padding: 2rem; font-family: monospace; font-size: clamp(0.9rem, 1.5vw, 1.2rem); color: #bedef5; overflow-y: auto; box-sizing: border-box; text-align: left; line-height: 1.6;">
+         <div id="cfg-rules" style="flex: 1;">
+            ${isRegexModeOn ? cfgOnHtml : cfgOffHtml}
+         </div>
+         <div style="border-top: 2px dashed #346282; margin: 0.5rem 0;">-</div>
+         <div id="cfg-simulation" style="min-height: 120px;">
+            <div>Chosen Input: <span id="cfg-target-str" style="color: #fff;">..</span></div>
+            <div style="margin-top:0.5rem;">Checking: <span id="cfg-typing-str" style="color:#00ffcc;"></span><span class="cursor" style="animation: blink 1s step-end infinite;">_</span></div>
+            <div id="cfg-result-str" style="margin-top:1rem; font-weight:bold; font-size: 1.2em;"></div>
+         </div>
+      </div>
+      <style>
+        @keyframes blink { 50% { opacity: 0; } }
+        .cfg-rule { transition: color 0.1s ease; }
+      </style>
+    `;
+  }
+
+  // =====================================================================
+  // PDA
+  // =====================================================================
+  // PDA 1: REGEX OFF (a, b) - Transition Matrix
+  const pdaOffTransitions = {
+    'w1':  { 'a': ['REJ1'], 'b': ['w2'] },
+    'w2':  { 'a': ['w3'], 'b': ['w3'] },
+    'w3':  { 'a': ['REJ2'], 'b': ['w4'] },
+    'w4':  { 'a': ['w7'], 'b': ['w5'] },
+    'w5':  { 'a': ['w6'], 'b': ['w5'] },
+    'w6':  { 'a': ['w6'], 'b': ['w8'] },
+    'w7':  { 'a': ['w7'], 'b': ['w9'] },
+    'w8':  { 'a': ['w11'], 'b': ['w10'] },
+    'w9':  { 'b': ['w4'], 'a': ['w11'] },
+    'w10': { 'a': ['REJ3']},
+    'w11': { 'a': ['w10'], 'b': ['w12'] },
+    'w12': { 'a': ['w13'], 'b': ['w14'] },
+    'w13': { 'a': ['REJ4'], 'b': ['w11'] },
+    'w14': { 'a': ['w15'], 'b': ['w17'] },
+    'w15': { 'a': ['w14'], 'b': ['w16'] },
+    'w16': { 'a': ['ACC1'], 'b': ['w17'] },
+    'w17': { 'a': ['w18'], 'b': ['w17'] },
+    'w18': { 'a': ['w15'], 'b': ['ACC2'] },
+    'REJ1': {}, 'REJ2': {}, 'REJ3': {}, 'REJ4': {},
+    'ACC1': {}, 'ACC2': {}
+  };
+
+  // =====================================================================
+  // PDA 2: REGEX ON (0, 1) - Transition Matrix
+  // =====================================================================
+  const pdaOnTransitions = {
+    'y1': { '0': ['y4'], '1': ['y1', 'y2'] },
+    'y2': { '0': ['y3', 'y5'], '1': [] },
+    'y3': { '0': [], '1': ['y6'] },
+    'y4': { '0': ['y5'], '1': ['y6'] },
+    'y5': { '0': ['y6'], '1': ['y6'] },
+    'y6': { '0': ['y7'], '1': ['y8'] },
+    'y7': { '0': ['2ACC1'], '1': ['y8'] },
+    'y8': { '0': ['y10'], '1': ['y9'] },
+    'y9': { '0': ['y10'], '1': ['2ACC2'] },
+    'y10': { '0': ['2ACC3'], '1': ['2ACC3'] },
+    '2ACC1': {}, '2ACC2': {}, '2ACC3': {}
+  };
+
+  function drawPDA() {
+    const loopSmooth = { type: 'curvedCW', roundness: 0.5 };
+    
+    let nodesArray = [];
+    let edgesArray = [];
+
+    if (!isRegexModeOn) {
+      // BUILD PDA 1 - Coordinates & Nodes
+      nodesArray = [
+        { id: 'Start', label: 'Start', shape: 'ellipse', x: 0, y: -250, font: { color: '#bedef5' } },
+        { id: 'w1', label: 'READ1', shape: 'diamond', x: 0, y: -150 },
+        { id: 'REJ1', label: 'REJECT', shape: 'ellipse', x: -300, y: -150, font: { color: '#ff3333' }, color: { border: '#ff3333' } },
+        { id: 'w2', label: 'READ2', shape: 'diamond', x: 150, y: -150 },
+        { id: 'w3', label: 'READ3', shape: 'diamond', x: 150, y: 0 },
+        { id: 'REJ2', label: 'REJECT', shape: 'ellipse', x: 300, y: 0, font: { color: '#ff3333' }, color: { border: '#ff3333' } },
+        { id: 'w4', label: 'READ4', shape: 'diamond', x: 0, y: 0 },
+        { id: 'w5', label: 'READ5', shape: 'diamond', x: -150, y: 0 },
+        { id: 'w6', label: 'READ6', shape: 'diamond', x: -150, y: 150 },
+        { id: 'w7', label: 'READ7', shape: 'diamond', x: 0, y: 150 },
+        { id: 'w8', label: 'READ8', shape: 'diamond', x: -150, y: 300 },
+        { id: 'w9', label: 'READ9', shape: 'diamond', x: 0, y: 300 },
+        { id: 'w10', label: 'READ10', shape: 'diamond', x: -150, y: 450 },
+        { id: 'REJ3', label: 'REJECT', shape: 'ellipse', x: -300, y: 450, font: { color: '#ff3333' }, color: { border: '#ff3333' } },
+        { id: 'w11', label: 'READ11', shape: 'diamond', x: 0, y: 450 },
+        { id: 'w12', label: 'READ12', shape: 'diamond', x: 150, y: 450 },
+        { id: 'w13', label: 'READ13', shape: 'diamond', x: 150, y: 300 },
+        { id: 'w14', label: 'READ14', shape: 'diamond', x: 300, y: 450 },
+        { id: 'w15', label: 'READ15', shape: 'diamond', x: 300, y: 300 },
+        { id: 'REJ4', label: 'REJECT', shape: 'ellipse', x: 150, y: 150, font: { color: '#ff3333' }, color: { border: '#ff3333' } },
+        { id: 'w16', label: 'READ16', shape: 'diamond', x: 300, y: 150 },
+        { id: 'ACC1', label: 'ACCEPT', shape: 'ellipse', x: 450, y: 150, font: { color: '#00ffcc' }, color: { border: '#00ffcc' } },
+        { id: 'w17', label: 'READ17', shape: 'diamond', x: 450, y: 450 },
+        { id: 'w18', label: 'READ18', shape: 'diamond', x: 600, y: 450 },
+        { id: 'ACC2', label: 'ACCEPT', shape: 'ellipse', x: 750, y: 450, font: { color: '#00ffcc' }, color: { border: '#00ffcc' } }
+      ];
+
+      edgesArray = [
+        { id: '1e1', from: 'Start', to: 'w1', label: '', smooth: false },
+        { id: '1e2', from: 'w1', to: 'REJ1', label: 'a', smooth: false },
+        { id: '1e3', from: 'w1', to: 'w2', label: 'b', smooth: false },
+        { id: '1e4', from: 'w2', to: 'w3', label: 'a,b', smooth: false },
+        { id: '1e5', from: 'w3', to: 'REJ2', label: 'a', smooth: false },
+        { id: '1e6', from: 'w3', to: 'w4', label: 'b', smooth: false },
+        { id: '1e7', from: 'w4', to: 'w7', label: 'a', smooth: false },
+        { id: '1e8', from: 'w4', to: 'w5', label: 'b', smooth: false },
+        { id: '1e9', from: 'w5', to: 'w5', label: 'b', smooth: loopSmooth },
+        { id: '1e10', from: 'w5', to: 'w6', label: 'a', smooth: false },
+        { id: '1e11', from: 'w6', to: 'w6', label: 'a', smooth: loopSmooth },
+        { id: '1e12', from: 'w6', to: 'w8', label: 'b', smooth: false },
+        { id: '1e13', from: 'w7', to: 'w7', label: 'a', smooth: loopSmooth },
+        { id: '1e14', from: 'w7', to: 'w9', label: 'b', smooth: false },
+        { id: '1e16', from: 'w9', to: 'w4', label: 'b', smooth: { type: 'curvedCW', roundness: 0.3 } },
+        { id: '1e17', from: 'w8', to: 'w11', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.3 } },
+        { id: '1e18', from: 'w8', to: 'w10', label: 'b', smooth: false },
+        { id: '1e19', from: 'w10', to: 'REJ3', label: 'a', smooth: false },
+        { id: '1e20', from: 'w11', to: 'w10', label: 'a', smooth: false },
+        { id: '1e21', from: 'w9', to: 'w11', label: 'a', smooth: false }, 
+        { id: '1e22', from: 'w11', to: 'w12', label: 'b', smooth: false },
+        { id: '1e23', from: 'w12', to: 'w13', label: 'a', smooth: false }, 
+        { id: '1e24', from: 'w13', to: 'REJ4', label: 'a', smooth: false }, 
+        { id: '1e25', from: 'w13', to: 'w11', label: 'b', smooth: { type: 'curvedCW', roundness: 0.4 } }, 
+        { id: '1e26', from: 'w12', to: 'w14', label: 'b', smooth: false },
+        { id: '1e27', from: 'w17', to: 'w17', label: 'b', smooth: loopSmooth },
+        { id: '1e28', from: 'w14', to: 'w15', label: 'a', smooth: false },
+        { id: '1e29', from: 'w15', to: 'w14', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.3 } }, 
+        { id: '1e30', from: 'w15', to: 'w16', label: 'b', smooth: false },
+        { id: '1e31', from: 'w16', to: 'ACC1', label: 'a', smooth: false },
+        { id: '1e32', from: 'w16', to: 'w17', label: 'b', smooth: { type: 'curvedCW', roundness: 0.3 } },
+        { id: '1e33', from: 'w14', to: 'w17', label: 'b', smooth: false }, 
+        { id: '1e34', from: 'w17', to: 'w18', label: 'a', smooth: false },
+        { id: '1e35', from: 'w18', to: 'w15', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.5 } }, 
+        { id: '1e36', from: 'w18', to: 'ACC2', label: 'b', smooth: false }
+      ];
+
+    } else {
+      // BUILD PDA 2
+      nodesArray = [
+        { id: 'Start2', label: 'Start', shape: 'ellipse', x: 0, y: -250, font: { color: '#bedef5' } },
+        { id: 'y1', label: 'READ1', shape: 'diamond', x: 0, y: -150 },
+        { id: 'y2', label: 'READ2', shape: 'diamond', x: 150, y: -150 },
+        { id: 'y3', label: 'READ3', shape: 'diamond', x: 300, y: -150 },
+        { id: 'y4', label: 'READ4', shape: 'diamond', x: 0, y: 0 },
+        { id: 'y5', label: 'READ5', shape: 'diamond', x: 150, y: 0 },
+        { id: 'y6', label: 'READ6', shape: 'diamond', x: 150, y: 150 },
+        { id: 'y7', label: 'READ7', shape: 'diamond', x: 300, y: 150 },
+        { id: 'y8', label: 'READ8', shape: 'diamond', x: 150, y: 300 },
+        { id: 'y9', label: 'READ9', shape: 'diamond', x: 300, y: 300 },
+        { id: 'y10', label: 'READ10', shape: 'diamond', x: 150, y: 450 },
+        { id: '2ACC1', label: 'ACCEPT', shape: 'ellipse', x: 450, y: 150, font: { color: '#00ffcc' }, color: { border: '#00ffcc' } },
+        { id: '2ACC2', label: 'ACCEPT', shape: 'ellipse', x: 450, y: 300, font: { color: '#00ffcc' }, color: { border: '#00ffcc' } },
+        { id: '2ACC3', label: 'ACCEPT', shape: 'ellipse', x: 300, y: 450, font: { color: '#00ffcc' }, color: { border: '#00ffcc' } }
+      ];
+
+      edgesArray = [
+        { id: '2e1', from: 'Start2', to: 'y1', label: '', smooth: false },
+        { id: '2e2', from: 'y1', to: 'y1', label: '1', smooth: loopSmooth },
+        { id: '2e3', from: 'y1', to: 'y2', label: '1', smooth: false },
+        { id: '2e4', from: 'y1', to: 'y4', label: '0', smooth: false },
+        { id: '2e5', from: 'y2', to: 'y3', label: '0', smooth: false },
+        { id: '2e6', from: 'y2', to: 'y5', label: '0', smooth: false },
+        { id: '2e7', from: 'y3', to: 'y6', label: '1', smooth: { type: 'curvedCW', roundness: 0.2 } },
+        { id: '2e8', from: 'y4', to: 'y5', label: '0', smooth: false },
+        { id: '2e9', from: 'y4', to: 'y6', label: '1', smooth: { type: 'curvedCW', roundness: 0.3 } },
+        { id: '2e10', from: 'y5', to: 'y6', label: '0,1', smooth: false },
+        { id: '2e11', from: 'y6', to: 'y7', label: '0', smooth: false },
+        { id: '2e12', from: 'y6', to: 'y8', label: '1', smooth: false },
+        { id: '2e13', from: 'y7', to: '2ACC1', label: '0', smooth: false },
+        { id: '2e14', from: 'y7', to: 'y8', label: '1', smooth: false },
+        { id: '2e15', from: 'y8', to: 'y9', label: '1', smooth: false },
+        { id: '2e16', from: 'y8', to: 'y10', label: '0', smooth: false },
+        { id: '2e17', from: 'y9', to: '2ACC2', label: '1', smooth: false },
+        { id: '2e18', from: 'y9', to: 'y10', label: '0', smooth: false },
+        { id: '2e19', from: 'y10', to: '2ACC3', label: '0,1', smooth: false }
+      ];
+    }
+
+    nodesDataSet = new vis.DataSet(nodesArray);
+    edgesDataSet = new vis.DataSet(edgesArray);
+
+    const data = { nodes: nodesDataSet, edges: edgesDataSet };
+    
+    const options = {
+      autoResize: false,
+      nodes: {
+        color: { background: '#0a1620', border: '#5293b6' },
+        font: { color: '#bedef5', size: 12, face: 'monospace' },
+        size: 26,
+        borderWidth: 2
+      },
+      edges: {
+        color: { color: '#25485e', highlight: '#5293b6' },
+        font: { color: '#bedef5', size: 12, face: 'monospace', strokeWidth: 0, align: 'top' },
+        arrows: { to: { enabled: true, scaleFactor: 0.6 } },
+        width: 3.5 
+      },
+      physics: { enabled: false }, 
+      interaction: { dragNodes: true, zoomView: true, dragView: true }
+    };
+
+    network = new vis.Network(screenDisplay, data, options);
+  }
+
   // Initial build invocation
   drawDFA();
 
@@ -249,12 +486,19 @@ document.addEventListener('DOMContentLoaded', () => {
     cfgBtn.className = machine === 'CFG' ? 'btn-machine active' : 'btn-machine inactive';
     pdaBtn.className = machine === 'PDA' ? 'btn-machine active' : 'btn-machine inactive';
 
+    if (network) { 
+      network.destroy(); 
+      network = null; 
+    }
+
     if (machine === 'DFA') {
       screenDisplay.innerHTML = '';
       drawDFA();
-    } else {
-      if (network) { network.destroy(); network = null; }
-      screenDisplay.innerHTML = `<div style="display:flex; height:100%; align-items:center; justify-content:center; color:#405663; text-transform:uppercase; text-align:center; font-family:sans-serif;">${machine} Channel Active<br><br>Awaiting Simulation Backend...</div>`;
+    } else if (machine === 'CFG') {
+      drawCFG();
+    } else if (machine === 'PDA') {
+      screenDisplay.innerHTML = '';
+      drawPDA();
     }
   }
 
@@ -293,71 +537,251 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- Pure Mathematical Traversal Simulation ---
+  // --- Hybrid Traversal Simulation (Isolated to chosen Channel) ---
   simulateBtn.addEventListener('click', () => {
-    if (currentMachine !== 'DFA') {
-      alert(`Simulation visuals for ${currentMachine} channel are currently unmapped.`);
-      return;
-    }
-
     const targetValue = document.getElementById(`input-${selectedInput}`).value.trim();
     if (targetValue === "") { alert("Please enter a string to simulate."); return; }
 
-    resetVisuals();
+    const isStringValid = (!isRegexModeOn) ? regexOffValidator.test(targetValue) : regexOnValidator.test(targetValue);
     
-    // Dynamic assignments matching active channel matrix parameters
-    const activeTransitions = isRegexModeOn ? dfaOnTransitions : dfaOffTransitions;
-    const activeValidChars = isRegexModeOn ? ['0', '1'] : ['a', 'b'];
-    const acceptStateName = isRegexModeOn ? 'Accept2' : 'Accept';
-    let currentState = isRegexModeOn ? 'Start2' : 'Start';
-    let delay = 0;
-
-    function animateTraversalStep(nodeId, bgColor, borderColor) {
-      setTimeout(() => {
-        if (nodesDataSet.get(nodeId)) {
-          nodesDataSet.update({ id: nodeId, color: { background: bgColor, border: borderColor } });
-          if (network) network.focus(nodeId, { scale: 1.0, animation: { duration: 150 } });
-        }
-      }, delay);
-    }
-
-    function animatePathStep(fromNode, toNode, colorHex) {
-      setTimeout(() => {
-        const edge = edgesDataSet.get({
-          filter: (e) => e.from === fromNode && e.to === toNode
-        })[0];
-        if (edge) {
-          edgesDataSet.update({ id: edge.id, color: { color: colorHex }, width: 6.5 }); 
-        }
-      }, delay);
-    }
-
-    // Illuminate Origin Position
-    animateTraversalStep(currentState, '#1a384d', '#5293b6'); 
-
-    for (let i = 0; i < targetValue.length; i++) {
-      const char = targetValue[i];
-      const previousState = currentState;
+    // =====================================================================
+    // DFA SIMULATION
+    // =====================================================================
+    if (currentMachine === 'DFA') {
+      resetVisuals();
       
-      delay += 800; 
+      const activeTransitions = isRegexModeOn ? dfaOnTransitions : dfaOffTransitions;
+      const activeValidChars = isRegexModeOn ? ['0', '1'] : ['a', 'b'];
+      const acceptStateName = isRegexModeOn ? 'Accept2' : 'Accept';
+      let currentState = isRegexModeOn ? 'Start2' : 'Start';
+      let delay = 0;
 
-      if (!activeValidChars.includes(char)) {
-        setTimeout(() => alert(`Sigma execution trace fault: Character '${char}' rejected.`), delay);
-        return;
+      function animateTraversalStep(nodeId, bgColor, borderColor) {
+        setTimeout(() => {
+          if (nodesDataSet.get(nodeId)) {
+            nodesDataSet.update({ id: nodeId, color: { background: bgColor, border: borderColor } });
+            if (network) network.focus(nodeId, { scale: 1.0, animation: { duration: 150 } });
+          }
+        }, delay);
       }
 
-      currentState = activeTransitions[currentState][char];
-      
-      animatePathStep(previousState, currentState, '#00ffcc');
-      animateTraversalStep(currentState, '#00ffcc', '#ffffff');
+      function animatePathStep(fromNode, toNode, colorHex) {
+        setTimeout(() => {
+          const edge = edgesDataSet.get({
+            filter: (e) => e.from === fromNode && e.to === toNode
+          })[0];
+          if (edge) {
+            edgesDataSet.update({ id: edge.id, color: { color: colorHex }, width: 6.5 }); 
+          }
+        }, delay);
+      }
+
+      animateTraversalStep(currentState, '#1a384d', '#5293b6'); 
+
+      for (let i = 0; i < targetValue.length; i++) {
+        const char = targetValue[i];
+        const previousState = currentState;
+        
+        delay += 800; 
+
+        if (!activeValidChars.includes(char)) {
+          setTimeout(() => alert(`Sigma execution trace fault: Character '${char}' rejected.`), delay);
+          return;
+        }
+
+        currentState = activeTransitions[currentState][char];
+        
+        animatePathStep(previousState, currentState, '#ffaa00');
+        animateTraversalStep(currentState, '#ffaa00', '#ffffff');
+      }
+
+      delay += 800;
+      setTimeout(() => {
+        const finalStateColor = (currentState === acceptStateName) ? '#00ffcc' : '#ff3333';
+        nodesDataSet.update({ id: currentState, color: { background: finalStateColor, border: '#ffffff' } });
+      }, delay);
+    } 
+    // =====================================================================
+    // CFG SIMULATION
+    // =====================================================================
+    else if (currentMachine === 'CFG') {
+      const targetEl = document.getElementById('cfg-target-str');
+      const typingEl = document.getElementById('cfg-typing-str');
+      const resultEl = document.getElementById('cfg-result-str');
+
+      targetEl.textContent = targetValue;
+      typingEl.textContent = "";
+      resultEl.textContent = "";
+      document.querySelectorAll('.cfg-rule').forEach(el => el.style.color = '#bedef5');
+
+      let delay = 0;
+
+      if (isStringValid) {
+          const activeCaptureRegex = isRegexModeOn ? 
+            /^((?:1|0)*)(1*)(0*)(101|01|000)((?:1|0)*)((?:101|00)*)(111|00|101)((?:1|0)*)$/ : 
+            /^(bab|bbb)(a*)(b*)(a*|b*)((?:ba)*)(aba)((?:bab|aba)*)(bb)((?:a|b)*)(bab|aba)((?:a|b)*)$/;
+          
+          const match = targetValue.match(activeCaptureRegex);
+          
+          const parts = isRegexModeOn ? 
+             [{rule:'Q', str:match[1]}, {rule:'R', str:match[2]}, {rule:'T', str:match[3]}, {rule:'U', str:match[4]}, {rule:'Q', str:match[5]}, {rule:'V', str:match[6]}, {rule:'W', str:match[7]}, {rule:'Q', str:match[8]}] :
+             [{rule:'Q', str:match[1]}, {rule:'R', str:match[2]}, {rule:'T', str:match[3]}, {rule:'U', str:match[4]}, {rule:'V', str:match[5]}, {rule:'S', str:match[6]}, {rule:'W', str:match[7]}, {rule:'S', str:match[8]}, {rule:'X', str:match[9]}, {rule:'Y', str:match[10]}, {rule:'X', str:match[11]}];
+
+          parts.forEach(part => {
+              if(!part.str) return; 
+              
+              for(let i=0; i<part.str.length; i++) {
+                  const char = part.str[i];
+                  delay += 300;
+                  setTimeout(() => {
+                      document.querySelectorAll('.cfg-rule').forEach(el => el.style.color = '#bedef5');
+                      const ruleEl = document.getElementById(`rule-${part.rule}`);
+                      if(ruleEl) ruleEl.style.color = '#00ffcc'; 
+                      typingEl.textContent += char; 
+                  }, delay);
+              }
+          });
+
+          delay += 500;
+          setTimeout(() => {
+              document.querySelectorAll('.cfg-rule').forEach(el => el.style.color = '#bedef5');
+              resultEl.style.color = '#00ffcc';
+              resultEl.textContent = "String VALID";
+          }, delay);
+
+      } else {
+          for(let i=0; i<targetValue.length; i++) {
+              delay += 300;
+              setTimeout(() => {
+                  typingEl.textContent += targetValue[i];
+              }, delay);
+          }
+          delay += 500;
+          setTimeout(() => {
+              resultEl.style.color = '#ff3333';
+              resultEl.textContent = "String INVALID";
+          }, delay);
+      }
     }
 
-    // Termination analysis sequence configuration
-    delay += 800;
-    setTimeout(() => {
-      const finalStateColor = (currentState === acceptStateName) ? '#00ffcc' : '#ff3333';
-      nodesDataSet.update({ id: currentState, color: { background: finalStateColor, border: '#ffffff' } });
-    }, delay);
+    // =====================================================================
+    // ISOLATED PDA SIMULATION SECTION
+    // =====================================================================
+    else if (currentMachine === 'PDA') {
+      resetVisuals();
+      
+      const activeTransitions = isRegexModeOn ? pdaOnTransitions : pdaOffTransitions;
+      const activeValidChars = isRegexModeOn ? ['0', '1'] : ['a', 'b'];
+      const acceptStateNames = isRegexModeOn ? ['2ACC1', '2ACC2', '2ACC3'] : ['ACC1', 'ACC2'];
+      let startState = isRegexModeOn ? 'Start2' : 'Start';
+      let delay = 0;
+
+      function animateTraversalStep(nodeId, bgColor, borderColor) {
+        setTimeout(() => {
+          if (nodesDataSet.get(nodeId)) {
+            nodesDataSet.update({ id: nodeId, color: { background: bgColor, border: borderColor } });
+            if (network) network.focus(nodeId, { scale: 1.0, animation: { duration: 150 } });
+          }
+        }, delay);
+      }
+
+      function animatePathStep(fromNode, toNode, colorHex) {
+        setTimeout(() => {
+          const edge = edgesDataSet.get({
+            filter: (e) => e.from === fromNode && e.to === toNode
+          })[0];
+          if (edge) {
+            edgesDataSet.update({ id: edge.id, color: { color: colorHex }, width: 6.5 }); 
+          }
+        }, delay);
+      }
+
+      for(let char of targetValue) {
+         if (!activeValidChars.includes(char)) {
+            alert(`Sigma execution trace fault: Character '${char}' rejected.`);
+            return;
+         }
+      }
+
+      let foundPath = null;
+      function search(currState, idx, pathArr) {
+          if (foundPath) return;
+          if (idx === targetValue.length) {
+              if (acceptStateNames.includes(currState)) {
+                  foundPath = [...pathArr];
+              }
+              return;
+          }
+          const char = targetValue[idx];
+          let nextOptions = [];
+          
+          if (activeTransitions[currState] && activeTransitions[currState][char]) {
+              nextOptions.push(...activeTransitions[currState][char]);
+          }
+          if (activeTransitions[currState]) {
+              for (const key in activeTransitions[currState]) {
+                  if (key.includes(char) && key.length > 1) {
+                      nextOptions.push(...activeTransitions[currState][key]);
+                  }
+              }
+          }
+
+          for (const nxt of nextOptions) {
+              pathArr.push(nxt);
+              search(nxt, idx + 1, pathArr);
+              pathArr.pop();
+          }
+      }
+
+      let initialPathState = !isRegexModeOn ? 'w1' : 'y1';
+      search(initialPathState, 0, [startState, initialPathState]);
+
+      let finalRenderPath = foundPath;
+
+      if (!foundPath) {
+          finalRenderPath = [startState, initialPathState];
+          let curr = initialPathState;
+          for (let i = 0; i < targetValue.length; i++) {
+              const char = targetValue[i];
+              let nxt = null;
+              if (activeTransitions[curr] && activeTransitions[curr][char] && activeTransitions[curr][char].length > 0) {
+                  nxt = activeTransitions[curr][char][0];
+              } else if (activeTransitions[curr]) {
+                  for (const key in activeTransitions[curr]) {
+                      if (key.includes(char) && activeTransitions[curr][key].length > 0) {
+                          nxt = activeTransitions[curr][key][0];
+                          break;
+                      }
+                  }
+              }
+              if (nxt) {
+                  finalRenderPath.push(nxt);
+                  curr = nxt;
+              } else {
+                  break;
+              }
+          }
+      }
+
+      animateTraversalStep(finalRenderPath[0], '#1a384d', '#5293b6'); 
+
+      for (let i = 1; i < finalRenderPath.length; i++) {
+        const previousState = finalRenderPath[i-1];
+        const currentState = finalRenderPath[i];
+        
+        delay += 800; 
+        
+        animatePathStep(previousState, currentState, '#00ffcc');
+        animateTraversalStep(currentState, '#00ffcc', '#ffffff');
+      }
+
+      delay += 800;
+      setTimeout(() => {
+        const finalState = finalRenderPath[finalRenderPath.length - 1];
+        const finalStateColor = acceptStateNames.includes(finalState) ? '#00ffcc' : '#ff3333';
+        nodesDataSet.update({ id: finalState, color: { background: finalStateColor, border: '#ffffff' } });
+      }, delay);
+    }
   });
 
 });
