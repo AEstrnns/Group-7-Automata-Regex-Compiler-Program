@@ -1,3 +1,11 @@
+const bgMusic = new Audio('I Don\'t Want to Set the World on Fire (Fallout Lofi).mp3');
+bgMusic.loop = true;
+bgMusic.volume = 0.2;
+
+document.addEventListener('click', () => {
+    bgMusic.play().catch(e => console.log("User interaction required for music."));
+}, { once: true });
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // --- Initial States and Core Configurations ---
