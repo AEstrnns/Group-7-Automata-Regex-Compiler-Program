@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // DFA 1: REGEX OFF (a, b)
   // =====================================================================
   const dfaOffTransitions = {
-    'Start':   { 'a': 'Trap1', 'b': 'q1'   },
+    'Start':   { 'a': 'Trap1', 'b': 'q1' },
     'q1':      { 'a': 'q2', 'b': 'q2' },
     'q2':      { 'b': 'q3', 'a': 'Trap1' },
     'q3':      { 'a': 'q4', 'b': 'q6' },
@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'q7':      { 'a': 'q7', 'b': 'q8' },
     'q8':      { 'a': 'q9', 'b': 'Trap2' },
     'q9':      { 'a': 'q11', 'b': 'q12' }, 
-    'q10':     { 'a': 'q12', 'b': 'Trap3' },
-    'q11':     { 'a': 'Trap2', 'b': 'q8', }, 
+    'q10':     { 'a': 'Trap3', 'b': 'q9' },
+    'q11':     { 'a': 'Trap2', 'b': 'q8' }, 
     'q12':     { 'a': 'q10', 'b': 'q13' },
     'q13':     { 'a': 'q14', 'b': 'q15' },
     'q14':     { 'a': 'q14', 'b': 'q16' },
@@ -142,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'e22', from: 'q10', to: 'Trap3', label: 'a', smooth: false }, 
         { id: 'e23', from: 'q11', to: 'q8', label: 'b', smooth: false }, 
         { id: 'e24', from: 'q11', to: 'Trap2', label: 'a', smooth: false },  
-        { id: 'e25', from: 'q12', to: 'qMid1', label: 'b', smooth: false },
         { id: 'e26', from: 'q12', to: 'q13', label: 'b', smooth: false },
         { id: 'e31', from: 'q13', to: 'q14', label: 'a', smooth: false },
         { id: 'e32', from: 'q13', to: 'q15', label: 'b', smooth: false },
@@ -151,9 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'e35', from: 'q15', to: 'q15', label: 'b', smooth: loopSmooth },
         { id: 'e36', from: 'q15', to: 'q17', label: 'a', smooth: false },
         { id: 'e37', from: 'q16', to: 'Accept', label: 'a', smooth: false },
-        { id: 'e38', from: 'q16', to: 'q15', label: 'a', smooth: false },
+        { id: 'e38', from: 'q16', to: 'q15', label: 'b', smooth: false }, 
         { id: 'e39', from: 'q17', to: 'Accept', label: 'b', smooth: false },
-        { id: 'e40', from: 'q17', to: 'q14', label: 'b', smooth: false },
+        { id: 'e40', from: 'q17', to: 'q14', label: 'a', smooth: false },
         { id: 'e41', from: 'Accept', to: 'Accept', label: 'a,b', smooth: loopSmooth },
         { id: 'e42', from: 'Trap1', to: 'Trap1', label: 'b,a', smooth: loopSmooth },
         { id: 'e43', from: 'Trap2', to: 'Trap2', label: 'b,a', smooth: loopSmooth },
@@ -598,8 +597,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentState = activeTransitions[currentState][char];
         
-        animatePathStep(previousState, currentState, '#ffaa00');
-        animateTraversalStep(currentState, '#ffaa00', '#ffffff');
+        animatePathStep(previousState, currentState, '#00ffcc');
+        animateTraversalStep(currentState, '#00ffcc', '#ffffff');
       }
 
       delay += 800;
