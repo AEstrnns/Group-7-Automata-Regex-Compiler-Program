@@ -599,7 +599,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentState = activeTransitions[currentState][char];
 
         animateTraversalStep(previousState, '#00332a', '#005544', false);
-        if (previousEdgeId) animatePathStep(previousState, currentState, '#005544', 8); 
+        if (previousEdgeId) animatePathStep(previousState, currentState, '#005544', 8);
+        delay += 500;
 
         animatePathStep(previousState, currentState, '#00ffcc', 5); 
         animateTraversalStep(currentState, '#00ffcc', '#ffffff', true);
@@ -792,6 +793,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         animateTraversalStep(previousState, '#00332a', '#00aa88', false);
         if (previousEdgeId) animatePathStep(previousState, currentState, '#00aa88', 8);
+        delay += 500;
 
         animatePathStep(previousState, currentState, '#00ffcc', 5);
         animateTraversalStep(currentState, '#00ffcc', '#ffffff', true);
