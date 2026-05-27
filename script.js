@@ -1,23 +1,25 @@
 const bgMusic = new Audio('falloutfire.mp3');
+const correctSound = new Audio('correct.mp3');
+const wrongSound = new Audio('wrong.mp3');
 bgMusic.loop = true;
 bgMusic.volume = 0.2;
 
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', () => {
-        bgMusic.play().catch(e => console.log("Music play blocked:", e));
-    }, { once: true });
+    bgMusic.play().catch(e => console.log("Music play blocked:", e));
+  }, { once: true });
 
   // --- Initial States and Core Configurations ---
   let currentMachine = 'DFA';
-  let isRegexModeOn = false; 
+  let isRegexModeOn = false;
   let selectedInput = 1;
-  let network = null; 
-  let nodesDataSet = null; 
+  let network = null;
+  let nodesDataSet = null;
   let edgesDataSet = null;
 
   const REGEX_OFF_STR = '(bab + bbb) a* b* (a* + b*) (ba)* (aba) (bab + aba)* bb (a + b)* (bab + aba) (a+b)*';
   const REGEX_ON_STR = '(1 + 0)* 1* 0* (101 + 01 + 000) (1 + 0)* (101 + 00)* (111 + 00 + 101) (1 + 0)*';
-  
+
   const regexOffValidator = /^(bab|bbb)a*b*(a*|b*)(ba)*(aba)(bab|aba)*bb(a|b)*(bab|aba)(a|b)*$/;
   const regexOnValidator = /^(1|0)*1*0*(101|01|000)(1|0)*(101|00)*(111|00|101)(1|0)*$/;
 
@@ -42,51 +44,51 @@ document.addEventListener('DOMContentLoaded', () => {
   // DFA 1: REGEX OFF (a, b)
   // =====================================================================
   const dfaOffTransitions = {
-    'Start':   { 'a': 'Trap1', 'b': 'q1' },
-    'q1':      { 'a': 'q2', 'b': 'q2' },
-    'q2':      { 'b': 'q3', 'a': 'Trap1' },
-    'q3':      { 'a': 'q4', 'b': 'q6' },
-    'q4':      { 'a': 'q4', 'b': 'q5' },
-    'q5':      { 'a': 'q9', 'b': 'q6' }, 
-    'q6':      { 'a': 'q7', 'b': 'q6' },
-    'q7':      { 'a': 'q7', 'b': 'q8' },
-    'q8':      { 'a': 'q9', 'b': 'Trap2' },
-    'q9':      { 'a': 'q11', 'b': 'q12' }, 
-    'q10':     { 'a': 'Trap3', 'b': 'q9' },
-    'q11':     { 'a': 'Trap2', 'b': 'q8' }, 
-    'q12':     { 'a': 'q10', 'b': 'q13' },
-    'q13':     { 'a': 'q14', 'b': 'q15' },
-    'q14':     { 'a': 'q14', 'b': 'q16' },
-    'q15':     { 'a': 'q17', 'b': 'q15' },
-    'q16':     { 'a': 'Accept', 'b': 'q15' },
-    'q17':     { 'a': 'q14', 'b': 'Accept' },
-    'Accept':  { 'a': 'Accept', 'b': 'Accept' },
-    'Trap1':   { 'a': 'Trap1', 'b': 'Trap1' },
-    'Trap2':   { 'a': 'Trap2', 'b': 'Trap2' },
-    'Trap3':   { 'a': 'Trap3', 'b': 'Trap3' }
+    'Start': { 'a': 'Trap1', 'b': 'q1' },
+    'q1': { 'a': 'q2', 'b': 'q2' },
+    'q2': { 'b': 'q3', 'a': 'Trap1' },
+    'q3': { 'a': 'q4', 'b': 'q6' },
+    'q4': { 'a': 'q4', 'b': 'q5' },
+    'q5': { 'a': 'q9', 'b': 'q6' },
+    'q6': { 'a': 'q7', 'b': 'q6' },
+    'q7': { 'a': 'q7', 'b': 'q8' },
+    'q8': { 'a': 'q9', 'b': 'Trap2' },
+    'q9': { 'a': 'q11', 'b': 'q12' },
+    'q10': { 'a': 'Trap3', 'b': 'q9' },
+    'q11': { 'a': 'Trap2', 'b': 'q8' },
+    'q12': { 'a': 'q10', 'b': 'q13' },
+    'q13': { 'a': 'q14', 'b': 'q15' },
+    'q14': { 'a': 'q14', 'b': 'q16' },
+    'q15': { 'a': 'q17', 'b': 'q15' },
+    'q16': { 'a': 'Accept', 'b': 'q15' },
+    'q17': { 'a': 'q14', 'b': 'Accept' },
+    'Accept': { 'a': 'Accept', 'b': 'Accept' },
+    'Trap1': { 'a': 'Trap1', 'b': 'Trap1' },
+    'Trap2': { 'a': 'Trap2', 'b': 'Trap2' },
+    'Trap3': { 'a': 'Trap3', 'b': 'Trap3' }
   };
 
   // =====================================================================
   // DFA 2: REGEX ON (0, 1)
   // =====================================================================
   const dfaOnTransitions = {
-    'Start2':   { '0': 'e2', '1': 'e1', },
-    'e1':       { '0': 'e3', '1': 'e1', },
-    'e2':       { '0': 'e4', '1': 'e5' },
-    'e3':       { '0': 'e4', '1': 'e5' },
-    'e4':       { '0': 'e5', '1': 'e5' },
-    'e5':       { '0': 'e7', '1': 'e6',},
-    'e6':       { '0': 'e9', '1': 'e8' },
-    'e7':       { '0': 'Accept2', '1': 'e6', },
-    'e8':       { '0': 'e9', '1': 'Accept2' },
-    'e9':       { '0': 'Accept2', '1': 'Accept2' },
-    'Accept2':  { '0': 'Accept2', '1': 'Accept2' }
+    'Start2': { '0': 'e2', '1': 'e1', },
+    'e1': { '0': 'e3', '1': 'e1', },
+    'e2': { '0': 'e4', '1': 'e5' },
+    'e3': { '0': 'e4', '1': 'e5' },
+    'e4': { '0': 'e5', '1': 'e5' },
+    'e5': { '0': 'e7', '1': 'e6', },
+    'e6': { '0': 'e9', '1': 'e8' },
+    'e7': { '0': 'Accept2', '1': 'e6', },
+    'e8': { '0': 'e9', '1': 'Accept2' },
+    'e9': { '0': 'Accept2', '1': 'Accept2' },
+    'Accept2': { '0': 'Accept2', '1': 'Accept2' }
   };
 
-    // --- DFA Builder ---
+  // --- DFA Builder ---
   function drawDFA() {
     const loopSmooth = { type: 'curvedCW', roundness: 0.5 };
-    
+
     let nodesArray = [];
     let edgesArray = [];
 
@@ -98,14 +100,14 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'q2', label: 'q2', shape: 'circle', x: -500, y: 0 },
         { id: 'q3', label: 'q3', shape: 'circle', x: -400, y: 0 },
         { id: 'Trap1', label: 'T', shape: 'circle', x: -550, y: 120, font: { color: '#ff3333' }, color: { border: '#ff3333' } },
-        { id: 'q4', label: 'q4', shape: 'circle', x: -300, y: 0 }, 
+        { id: 'q4', label: 'q4', shape: 'circle', x: -300, y: 0 },
         { id: 'q5', label: 'q5', shape: 'circle', x: -200, y: 0 },
         { id: 'q6', label: 'q6', shape: 'circle', x: -300, y: 80 },
         { id: 'q7', label: 'q7', shape: 'circle', x: -300, y: 160 },
         { id: 'q8', label: 'q8', shape: 'circle', x: -150, y: 160 },
         { id: 'q9', label: 'q9', shape: 'circle', x: -100, y: 0 },
-        { id: 'q10', label: 'q10', shape: 'circle', x: -25, y: -100 }, 
-        { id: 'q11', label: 'q11', shape: 'circle', x: 50, y: 100 }, 
+        { id: 'q10', label: 'q10', shape: 'circle', x: -25, y: -100 },
+        { id: 'q11', label: 'q11', shape: 'circle', x: 50, y: 100 },
         { id: 'q12', label: 'q12', shape: 'circle', x: 50, y: 0 },
         { id: 'q13', label: 'q13', shape: 'circle', x: 150, y: 0 },
         { id: 'Trap3', label: 'T', shape: 'circle', x: 200, y: -150, font: { color: '#ff3333' }, color: { border: '#ff3333' } },
@@ -135,13 +137,13 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'e15', from: 'q7', to: 'q8', label: 'b', smooth: false },
         { id: 'e16', from: 'q8', to: 'q9', label: 'a', smooth: false },
         { id: 'e17', from: 'q8', to: 'Trap2', label: 'b', smooth: false },
-        { id: 'e18', from: 'q9', to: 'q12', label: 'b', smooth: false }, 
-        { id: 'e19', from: 'q10', to: 'q9', label: 'b', smooth: false }, 
-        { id: 'e20', from: 'q9', to: 'q11', label: 'a', smooth: false }, 
-        { id: 'e21', from: 'q12', to: 'q10', label: 'a', smooth: false }, 
-        { id: 'e22', from: 'q10', to: 'Trap3', label: 'a', smooth: false }, 
-        { id: 'e23', from: 'q11', to: 'q8', label: 'b', smooth: false }, 
-        { id: 'e24', from: 'q11', to: 'Trap2', label: 'a', smooth: false },  
+        { id: 'e18', from: 'q9', to: 'q12', label: 'b', smooth: false },
+        { id: 'e19', from: 'q10', to: 'q9', label: 'b', smooth: false },
+        { id: 'e20', from: 'q9', to: 'q11', label: 'a', smooth: false },
+        { id: 'e21', from: 'q12', to: 'q10', label: 'a', smooth: false },
+        { id: 'e22', from: 'q10', to: 'Trap3', label: 'a', smooth: false },
+        { id: 'e23', from: 'q11', to: 'q8', label: 'b', smooth: false },
+        { id: 'e24', from: 'q11', to: 'Trap2', label: 'a', smooth: false },
         { id: 'e26', from: 'q12', to: 'q13', label: 'b', smooth: false },
         { id: 'e31', from: 'q13', to: 'q14', label: 'a', smooth: false },
         { id: 'e32', from: 'q13', to: 'q15', label: 'b', smooth: false },
@@ -150,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'e35', from: 'q15', to: 'q15', label: 'b', smooth: loopSmooth },
         { id: 'e36', from: 'q15', to: 'q17', label: 'a', smooth: false },
         { id: 'e37', from: 'q16', to: 'Accept', label: 'a', smooth: false },
-        { id: 'e38', from: 'q16', to: 'q15', label: 'b', smooth: false }, 
+        { id: 'e38', from: 'q16', to: 'q15', label: 'b', smooth: false },
         { id: 'e39', from: 'q17', to: 'Accept', label: 'b', smooth: false },
         { id: 'e40', from: 'q17', to: 'q14', label: 'a', smooth: false },
         { id: 'e41', from: 'Accept', to: 'Accept', label: 'a,b', smooth: loopSmooth },
@@ -202,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
     edgesDataSet = new vis.DataSet(edgesArray);
 
     const data = { nodes: nodesDataSet, edges: edgesDataSet };
-    
+
     const options = {
       autoResize: false,
       nodes: {
@@ -215,9 +217,9 @@ document.addEventListener('DOMContentLoaded', () => {
         color: { color: '#25485e', highlight: '#5293b6' },
         font: { color: '#bedef5', size: 12, face: 'monospace', strokeWidth: 0, align: 'top' },
         arrows: { to: { enabled: true, scaleFactor: 0.6 } },
-        width: 3.5 
+        width: 3.5
       },
-      physics: { enabled: false }, 
+      physics: { enabled: false },
       interaction: { dragNodes: true, zoomView: true, dragView: true }
     };
 
@@ -228,9 +230,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // CFG
   // =====================================================================
   function drawCFG() {
-  // =====================================================================
-  // CFG 1: REGEX OFF (a, b)
-  // =====================================================================
+    // =====================================================================
+    // CFG 1: REGEX OFF (a, b)
+    // =====================================================================
     const cfgOffHtml = `
       <div id="rule-S" class="cfg-rule">S -> Q R T U V aba W bb X Y X</div>
       <div id="rule-Q" class="cfg-rule">Q -> bab | bbb</div>
@@ -243,9 +245,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <div id="rule-Y" class="cfg-rule">Y -> bab | aba</div>
     `;
 
-  // =====================================================================
-  // CFG 2: REGEX ON (0, 1)
-  // =====================================================================
+    // =====================================================================
+    // CFG 2: REGEX ON (0, 1)
+    // =====================================================================
     const cfgOnHtml = `
       <div id="rule-S" class="cfg-rule">S -> Q R T U Q V W Q</div>
       <div id="rule-Q" class="cfg-rule">Q -> 1Q | 0Q | ^</div>
@@ -280,47 +282,47 @@ document.addEventListener('DOMContentLoaded', () => {
   // =====================================================================
   // PDA 1: REGEX OFF (a, b) - Transition Matrix
   const pdaOffTransitions = {
-    'w1':  { 'a': ['REJ1'], 'b': ['w2'] },
-    'w2':  { 'a': ['w3'],   'b': ['w3'] },
-    'w3':  { 'a': ['REJ2'], 'b': ['w4'] },
-    'w4':  { 'a': ['w7'],   'b': ['w5'] },
-    'w5':  { 'a': ['w6'],   'b': ['w5'] },
-    'w6':  { 'a': ['w6'],   'b': ['w8'] },
-    'w7':  { 'a': ['w7'],   'b': ['w9'] },
-    'w8':  { 'a': ['w11'],  'b': ['REJ5'] },
-    'w9':  { 'a': ['w11'],  'b': ['w5'] },
+    'w1': { 'a': ['REJ1'], 'b': ['w2'] },
+    'w2': { 'a': ['w3'], 'b': ['w3'] },
+    'w3': { 'a': ['REJ2'], 'b': ['w4'] },
+    'w4': { 'a': ['w7'], 'b': ['w5'] },
+    'w5': { 'a': ['w6'], 'b': ['w5'] },
+    'w6': { 'a': ['w6'], 'b': ['w8'] },
+    'w7': { 'a': ['w7'], 'b': ['w9'] },
+    'w8': { 'a': ['w11'], 'b': ['REJ5'] },
+    'w9': { 'a': ['w11'], 'b': ['w5'] },
     'w10': { 'a': ['REJ3'], 'b': ['w8'] },
-    'w11': { 'a': ['w10'],  'b': ['w12'] },
-    'w12': { 'a': ['w13'],  'b': ['w14'] },
+    'w11': { 'a': ['w10'], 'b': ['w12'] },
+    'w12': { 'a': ['w13'], 'b': ['w14'] },
     'w13': { 'a': ['REJ4'], 'b': ['w11'] },
-    'w14': { 'a': ['w15'],  'b': ['w17'] },
-    'w15': { 'a': ['w15'],  'b': ['w16'] },
+    'w14': { 'a': ['w15'], 'b': ['w17'] },
+    'w15': { 'a': ['w15'], 'b': ['w16'] },
     'w16': { 'a': ['ACC1'], 'b': ['w17'] },
-    'w17': { 'a': ['w18'],  'b': ['w17'] },
-    'w18': { 'a': ['w15'],  'b': ['ACC2'] },
+    'w17': { 'a': ['w18'], 'b': ['w17'] },
+    'w18': { 'a': ['w15'], 'b': ['ACC2'] },
     'REJ1': {}, 'REJ2': {}, 'REJ3': {}, 'REJ4': {}, 'REJ5': {},
     'ACC1': {}, 'ACC2': {}
   };
   // =====================================================================
   // PDA 2: REGEX ON (0, 1) - Transition Matrix
   // =====================================================================
-const pdaOnTransitions = {
-    'y1':  { '0': ['y4'],       '1': ['y2'] },
-    'y2':  { '0': ['y3'], '1': ['y2'] },
-    'y3':  { '0': ['y5'],       '1': ['y6'] },
-    'y4':  { '0': ['y5'],       '1': ['y6'] },
-    'y5':  { '0': ['y6'],       '1': ['y6'] },
-    'y6':  { '0': ['y7'],       '1': ['y8'] },
-    'y7':  { '0': ['2ACC1'],    '1': ['y8'] },
-    'y8':  { '0': ['y10'],      '1': ['y9'] },
-    'y9':  { '0': ['y10'],      '1': ['2ACC2'] },
-    'y10': { '0': ['2ACC3'],    '1': ['2ACC3'] },
+  const pdaOnTransitions = {
+    'y1': { '0': ['y4'], '1': ['y2'] },
+    'y2': { '0': ['y3'], '1': ['y2'] },
+    'y3': { '0': ['y5'], '1': ['y6'] },
+    'y4': { '0': ['y5'], '1': ['y6'] },
+    'y5': { '0': ['y6'], '1': ['y6'] },
+    'y6': { '0': ['y7'], '1': ['y8'] },
+    'y7': { '0': ['2ACC1'], '1': ['y8'] },
+    'y8': { '0': ['y10'], '1': ['y9'] },
+    'y9': { '0': ['y10'], '1': ['2ACC2'] },
+    'y10': { '0': ['2ACC3'], '1': ['2ACC3'] },
     '2ACC1': {}, '2ACC2': {}, '2ACC3': {}
   };
 
   function drawPDA() {
     const loopSmooth = { type: 'curvedCW', roundness: 0.5 };
-    
+
     let nodesArray = [];
     let edgesArray = [];
 
@@ -376,21 +378,21 @@ const pdaOnTransitions = {
         { id: '1e19', from: 'w8', to: 'REJ5', label: 'b', smooth: false },
         { id: '1e20', from: 'w10', to: 'REJ3', label: 'a', smooth: false },
         { id: '1e21', from: 'w11', to: 'w10', label: 'a', smooth: false },
-        { id: '1e22', from: 'w9', to: 'w11', label: 'a', smooth: false }, 
+        { id: '1e22', from: 'w9', to: 'w11', label: 'a', smooth: false },
         { id: '1e23', from: 'w11', to: 'w12', label: 'b', smooth: false },
-        { id: '1e24', from: 'w12', to: 'w13', label: 'a', smooth: false }, 
-        { id: '1e25', from: 'w13', to: 'REJ4', label: 'a', smooth: false }, 
-        { id: '1e26', from: 'w13', to: 'w11', label: 'b', smooth: { type: 'curvedCW', roundness: 0.4 } }, 
+        { id: '1e24', from: 'w12', to: 'w13', label: 'a', smooth: false },
+        { id: '1e25', from: 'w13', to: 'REJ4', label: 'a', smooth: false },
+        { id: '1e26', from: 'w13', to: 'w11', label: 'b', smooth: { type: 'curvedCW', roundness: 0.4 } },
         { id: '1e27', from: 'w12', to: 'w14', label: 'b', smooth: false },
         { id: '1e28', from: 'w17', to: 'w17', label: 'b', smooth: loopSmooth },
         { id: '1e29', from: 'w14', to: 'w15', label: 'a', smooth: false },
-        { id: '1e30', from: 'w15', to: 'w15', label: 'a', smooth: loopSmooth }, 
+        { id: '1e30', from: 'w15', to: 'w15', label: 'a', smooth: loopSmooth },
         { id: '1e31', from: 'w15', to: 'w16', label: 'b', smooth: false },
         { id: '1e32', from: 'w16', to: 'ACC1', label: 'a', smooth: false },
         { id: '1e33', from: 'w16', to: 'w17', label: 'b', smooth: { type: 'curvedCW', roundness: 0.3 } },
-        { id: '1e34', from: 'w14', to: 'w17', label: 'b', smooth: false }, 
+        { id: '1e34', from: 'w14', to: 'w17', label: 'b', smooth: false },
         { id: '1e35', from: 'w17', to: 'w18', label: 'a', smooth: false },
-        { id: '1e36', from: 'w18', to: 'w15', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.5 } }, 
+        { id: '1e36', from: 'w18', to: 'w15', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.5 } },
         { id: '1e37', from: 'w18', to: 'ACC2', label: 'b', smooth: false }
       ];
 
@@ -440,7 +442,7 @@ const pdaOnTransitions = {
     edgesDataSet = new vis.DataSet(edgesArray);
 
     const data = { nodes: nodesDataSet, edges: edgesDataSet };
-    
+
     const options = {
       autoResize: false,
       nodes: {
@@ -453,9 +455,9 @@ const pdaOnTransitions = {
         color: { color: '#25485e', highlight: '#5293b6' },
         font: { color: '#bedef5', size: 12, face: 'monospace', strokeWidth: 0, align: 'top' },
         arrows: { to: { enabled: true, scaleFactor: 0.6 } },
-        width: 3.5 
+        width: 3.5
       },
-      physics: { enabled: false }, 
+      physics: { enabled: false },
       interaction: { dragNodes: true, zoomView: true, dragView: true }
     };
 
@@ -467,7 +469,7 @@ const pdaOnTransitions = {
 
   function resetVisuals() {
     if (!nodesDataSet || !edgesDataSet) return;
-    
+
     const allNodes = nodesDataSet.get();
     allNodes.forEach(node => {
       if (node.id.startsWith('Trap')) {
@@ -493,9 +495,9 @@ const pdaOnTransitions = {
     cfgBtn.className = machine === 'CFG' ? 'btn-machine active' : 'btn-machine inactive';
     pdaBtn.className = machine === 'PDA' ? 'btn-machine active' : 'btn-machine inactive';
 
-    if (network) { 
-      network.destroy(); 
-      network = null; 
+    if (network) {
+      network.destroy();
+      network = null;
     }
 
     if (machine === 'DFA') {
@@ -536,10 +538,10 @@ const pdaOnTransitions = {
     const activeRegex = isRegexModeOn ? regexOnValidator : regexOffValidator;
     for (let i = 1; i <= 5; i++) {
       const inputVal = document.getElementById(`input-${i}`).value.trim();
-      const light = document.getElementById(`input-${i}`).nextElementSibling; 
+      const light = document.getElementById(`input-${i}`).nextElementSibling;
       light.className = 'indicator-light';
-      
-      if (inputVal === "") continue; 
+
+      if (inputVal === "") continue;
       light.classList.add(activeRegex.test(inputVal) ? 'valid' : 'invalid');
     }
   });
@@ -550,24 +552,26 @@ const pdaOnTransitions = {
     if (targetValue === "") { alert("Please enter a string to simulate."); return; }
 
     const isStringValid = (!isRegexModeOn) ? regexOffValidator.test(targetValue) : regexOnValidator.test(targetValue);
-    
+
     // =====================================================================
     // DFA SIMULATION
     // =====================================================================
     if (currentMachine === 'DFA') {
       resetVisuals();
-      
+
       const activeTransitions = isRegexModeOn ? dfaOnTransitions : dfaOffTransitions;
       const activeValidChars = isRegexModeOn ? ['0', '1'] : ['a', 'b'];
       const acceptStateName = isRegexModeOn ? 'Accept2' : 'Accept';
       let currentState = isRegexModeOn ? 'Start2' : 'Start';
       let delay = 0;
 
-      function animateTraversalStep(nodeId, bgColor, borderColor) {
+      function animateTraversalStep(nodeId, bgColor, borderColor, shouldFocus = false) {
         setTimeout(() => {
           if (nodesDataSet.get(nodeId)) {
             nodesDataSet.update({ id: nodeId, color: { background: bgColor, border: borderColor } });
-            if (network) network.focus(nodeId, { scale: 1.0, animation: { duration: 150 } });
+            if (shouldFocus && network) {
+              network.focus(nodeId, { scale: 1.0, animation: { duration: 150 } });
+            }
           }
         }, delay);
       }
@@ -578,36 +582,38 @@ const pdaOnTransitions = {
             filter: (e) => e.from === fromNode && e.to === toNode
           })[0];
           if (edge) {
-            edgesDataSet.update({ id: edge.id, color: { color: colorHex }, width: 6.5 }); 
+            edgesDataSet.update({ id: edge.id, color: { color: colorHex }, width: 6.5 });
           }
         }, delay);
       }
 
-      animateTraversalStep(currentState, '#1a384d', '#5293b6'); 
+      animateTraversalStep(currentState, '#1a384d', '#5293b6');
 
       for (let i = 0; i < targetValue.length; i++) {
         const char = targetValue[i];
         const previousState = currentState;
-        
-        delay += 800; 
+        const previousEdgeId = edgesDataSet.get().find(e => e.from === previousState && e.to === activeTransitions[previousState][char])?.id;
 
-        if (!activeValidChars.includes(char)) {
-          setTimeout(() => alert(`Sigma execution trace fault: Character '${char}' rejected.`), delay);
-          return;
-        }
+        delay += 800;
 
         currentState = activeTransitions[currentState][char];
-        
-        animatePathStep(previousState, currentState, '#00aa88');
-        animateTraversalStep(currentState, '#00ffcc', '#ffffff');
+
+        animateTraversalStep(previousState, '#00332a', '#005544', false);
+        if (previousEdgeId) animatePathStep(previousState, currentState, '#005544', 8); 
+
+        animatePathStep(previousState, currentState, '#00ffcc', 5); 
+        animateTraversalStep(currentState, '#00ffcc', '#ffffff', true);
       }
 
       delay += 800;
       setTimeout(() => {
-        const finalStateColor = (currentState === acceptStateName) ? '#00ffcc' : '#ff3333';
+        const isAccepted = (currentState === acceptStateName);
+        const finalStateColor = isAccepted ? '#00ffcc' : '#ff3333';
         nodesDataSet.update({ id: currentState, color: { background: finalStateColor, border: '#ffffff' } });
+
+        isAccepted ? correctSound.play() : wrongSound.play();
       }, delay);
-    } 
+    }
     // =====================================================================
     // CFG SIMULATION
     // =====================================================================
@@ -624,50 +630,53 @@ const pdaOnTransitions = {
       let delay = 0;
 
       if (isStringValid) {
-          const activeCaptureRegex = isRegexModeOn ? 
-            /^((?:1|0)*)(1*)(0*)(101|01|000)((?:1|0)*)((?:101|00)*)(111|00|101)((?:1|0)*)$/ : 
-            /^(bab|bbb)(a*)(b*)(a*|b*)((?:ba)*)(aba)((?:bab|aba)*)(bb)((?:a|b)*)(bab|aba)((?:a|b)*)$/;
-          
-          const match = targetValue.match(activeCaptureRegex);
-          
-          const parts = isRegexModeOn ? 
-             [{rule:'Q', str:match[1]}, {rule:'R', str:match[2]}, {rule:'T', str:match[3]}, {rule:'U', str:match[4]}, {rule:'Q', str:match[5]}, {rule:'V', str:match[6]}, {rule:'W', str:match[7]}, {rule:'Q', str:match[8]}] :
-             [{rule:'Q', str:match[1]}, {rule:'R', str:match[2]}, {rule:'T', str:match[3]}, {rule:'U', str:match[4]}, {rule:'V', str:match[5]}, {rule:'S', str:match[6]}, {rule:'W', str:match[7]}, {rule:'S', str:match[8]}, {rule:'X', str:match[9]}, {rule:'Y', str:match[10]}, {rule:'X', str:match[11]}];
+        const activeCaptureRegex = isRegexModeOn ?
+          /^((?:1|0)*)(1*)(0*)(101|01|000)((?:1|0)*)((?:101|00)*)(111|00|101)((?:1|0)*)$/ :
+          /^(bab|bbb)(a*)(b*)(a*|b*)((?:ba)*)(aba)((?:bab|aba)*)(bb)((?:a|b)*)(bab|aba)((?:a|b)*)$/;
 
-          parts.forEach(part => {
-              if(!part.str) return; 
-              
-              for(let i=0; i<part.str.length; i++) {
-                  const char = part.str[i];
-                  delay += 300;
-                  setTimeout(() => {
-                      document.querySelectorAll('.cfg-rule').forEach(el => el.style.color = '#bedef5');
-                      const ruleEl = document.getElementById(`rule-${part.rule}`);
-                      if(ruleEl) ruleEl.style.color = '#00ffcc'; 
-                      typingEl.textContent += char; 
-                  }, delay);
-              }
-          });
+        const match = targetValue.match(activeCaptureRegex);
 
-          delay += 500;
-          setTimeout(() => {
+        const parts = isRegexModeOn ?
+          [{ rule: 'Q', str: match[1] }, { rule: 'R', str: match[2] }, { rule: 'T', str: match[3] }, { rule: 'U', str: match[4] }, { rule: 'Q', str: match[5] }, { rule: 'V', str: match[6] }, { rule: 'W', str: match[7] }, { rule: 'Q', str: match[8] }] :
+          [{ rule: 'Q', str: match[1] }, { rule: 'R', str: match[2] }, { rule: 'T', str: match[3] }, { rule: 'U', str: match[4] }, { rule: 'V', str: match[5] }, { rule: 'S', str: match[6] }, { rule: 'W', str: match[7] }, { rule: 'S', str: match[8] }, { rule: 'X', str: match[9] }, { rule: 'Y', str: match[10] }, { rule: 'X', str: match[11] }];
+
+        parts.forEach(part => {
+          if (!part.str) return;
+
+          for (let i = 0; i < part.str.length; i++) {
+            const char = part.str[i];
+            delay += 300;
+            setTimeout(() => {
               document.querySelectorAll('.cfg-rule').forEach(el => el.style.color = '#bedef5');
-              resultEl.style.color = '#00ffcc';
-              resultEl.textContent = "String VALID";
-          }, delay);
+              const ruleEl = document.getElementById(`rule-${part.rule}`);
+              if (ruleEl) ruleEl.style.color = '#00ffcc';
+              typingEl.textContent += char;
+            }, delay);
+
+          }
+        });
+
+        delay += 500;
+        setTimeout(() => {
+          document.querySelectorAll('.cfg-rule').forEach(el => el.style.color = '#bedef5');
+          resultEl.style.color = '#00ffcc';
+          resultEl.textContent = "String VALID";
+          correctSound.play(); // Play success sound
+        }, delay);
 
       } else {
-          for(let i=0; i<targetValue.length; i++) {
-              delay += 300;
-              setTimeout(() => {
-                  typingEl.textContent += targetValue[i];
-              }, delay);
-          }
-          delay += 500;
+        for (let i = 0; i < targetValue.length; i++) {
+          delay += 300;
           setTimeout(() => {
-              resultEl.style.color = '#ff3333';
-              resultEl.textContent = "String INVALID";
+            typingEl.textContent += targetValue[i];
           }, delay);
+        }
+        delay += 500;
+        setTimeout(() => {
+          resultEl.style.color = '#ff3333';
+          resultEl.textContent = "String INVALID";
+          wrongSound.play(); // Play failure sound
+        }, delay);
       }
     }
 
@@ -676,18 +685,20 @@ const pdaOnTransitions = {
     // =====================================================================
     else if (currentMachine === 'PDA') {
       resetVisuals();
-      
+
       const activeTransitions = isRegexModeOn ? pdaOnTransitions : pdaOffTransitions;
       const activeValidChars = isRegexModeOn ? ['0', '1'] : ['a', 'b'];
       const acceptStateNames = isRegexModeOn ? ['2ACC1', '2ACC2', '2ACC3'] : ['ACC1', 'ACC2'];
       let startState = isRegexModeOn ? 'Start2' : 'Start';
       let delay = 0;
 
-      function animateTraversalStep(nodeId, bgColor, borderColor) {
+      function animateTraversalStep(nodeId, bgColor, borderColor, shouldFocus = false) {
         setTimeout(() => {
           if (nodesDataSet.get(nodeId)) {
             nodesDataSet.update({ id: nodeId, color: { background: bgColor, border: borderColor } });
-            if (network) network.focus(nodeId, { scale: 1.0, animation: { duration: 150 } });
+            if (shouldFocus && network) {
+              network.focus(nodeId, { scale: 1.0, animation: { duration: 150 } });
+            }
           }
         }, delay);
       }
@@ -698,46 +709,46 @@ const pdaOnTransitions = {
             filter: (e) => e.from === fromNode && e.to === toNode
           })[0];
           if (edge) {
-            edgesDataSet.update({ id: edge.id, color: { color: colorHex }, width: 6.5 }); 
+            edgesDataSet.update({ id: edge.id, color: { color: colorHex }, width: 6.5 });
           }
         }, delay);
       }
 
-      for(let char of targetValue) {
-         if (!activeValidChars.includes(char)) {
-            alert(`Sigma execution trace fault: Character '${char}' rejected.`);
-            return;
-         }
+      for (let char of targetValue) {
+        if (!activeValidChars.includes(char)) {
+          alert(`Sigma execution trace fault: Character '${char}' rejected.`);
+          return;
+        }
       }
 
       let foundPath = null;
       function search(currState, idx, pathArr) {
-          if (foundPath) return;
-          if (idx === targetValue.length) {
-              if (acceptStateNames.includes(currState)) {
-                  foundPath = [...pathArr];
-              }
-              return;
+        if (foundPath) return;
+        if (idx === targetValue.length) {
+          if (acceptStateNames.includes(currState)) {
+            foundPath = [...pathArr];
           }
-          const char = targetValue[idx];
-          let nextOptions = [];
-          
-          if (activeTransitions[currState] && activeTransitions[currState][char]) {
-              nextOptions.push(...activeTransitions[currState][char]);
-          }
-          if (activeTransitions[currState]) {
-              for (const key in activeTransitions[currState]) {
-                  if (key.includes(char) && key.length > 1) {
-                      nextOptions.push(...activeTransitions[currState][key]);
-                  }
-              }
-          }
+          return;
+        }
+        const char = targetValue[idx];
+        let nextOptions = [];
 
-          for (const nxt of nextOptions) {
-              pathArr.push(nxt);
-              search(nxt, idx + 1, pathArr);
-              pathArr.pop();
+        if (activeTransitions[currState] && activeTransitions[currState][char]) {
+          nextOptions.push(...activeTransitions[currState][char]);
+        }
+        if (activeTransitions[currState]) {
+          for (const key in activeTransitions[currState]) {
+            if (key.includes(char) && key.length > 1) {
+              nextOptions.push(...activeTransitions[currState][key]);
+            }
           }
+        }
+
+        for (const nxt of nextOptions) {
+          pathArr.push(nxt);
+          search(nxt, idx + 1, pathArr);
+          pathArr.pop();
+        }
       }
 
       let initialPathState = !isRegexModeOn ? 'w1' : 'y1';
@@ -746,47 +757,56 @@ const pdaOnTransitions = {
       let finalRenderPath = foundPath;
 
       if (!foundPath) {
-          finalRenderPath = [startState, initialPathState];
-          let curr = initialPathState;
-          for (let i = 0; i < targetValue.length; i++) {
-              const char = targetValue[i];
-              let nxt = null;
-              if (activeTransitions[curr] && activeTransitions[curr][char] && activeTransitions[curr][char].length > 0) {
-                  nxt = activeTransitions[curr][char][0];
-              } else if (activeTransitions[curr]) {
-                  for (const key in activeTransitions[curr]) {
-                      if (key.includes(char) && activeTransitions[curr][key].length > 0) {
-                          nxt = activeTransitions[curr][key][0];
-                          break;
-                      }
-                  }
+        finalRenderPath = [startState, initialPathState];
+        let curr = initialPathState;
+        for (let i = 0; i < targetValue.length; i++) {
+          const char = targetValue[i];
+          let nxt = null;
+          if (activeTransitions[curr] && activeTransitions[curr][char] && activeTransitions[curr][char].length > 0) {
+            nxt = activeTransitions[curr][char][0];
+          } else if (activeTransitions[curr]) {
+            for (const key in activeTransitions[curr]) {
+              if (key.includes(char) && activeTransitions[curr][key].length > 0) {
+                nxt = activeTransitions[curr][key][0];
+                break;
               }
-              if (nxt) {
-                  finalRenderPath.push(nxt);
-                  curr = nxt;
-              } else {
-                  break;
-              }
+            }
           }
+          if (nxt) {
+            finalRenderPath.push(nxt);
+            curr = nxt;
+          } else {
+            break;
+          }
+        }
       }
 
-      animateTraversalStep(finalRenderPath[0], '#1a384d', '#5293b6'); 
+      animateTraversalStep(finalRenderPath[0], '#1a384d', '#5293b6');
 
       for (let i = 1; i < finalRenderPath.length; i++) {
-        const previousState = finalRenderPath[i-1];
+        const previousState = finalRenderPath[i - 1];
         const currentState = finalRenderPath[i];
-        
-        delay += 800; 
-        
-        animatePathStep(previousState, currentState, '#00aa88');
-        animateTraversalStep(currentState, '#00ffcc', '#ffffff');
+        const previousEdgeId = edgesDataSet.get().find(e => e.from === previousState && e.to === currentState)?.id;
+
+        delay += 800;
+
+        animateTraversalStep(previousState, '#00332a', '#00aa88', false);
+        if (previousEdgeId) animatePathStep(previousState, currentState, '#00aa88', 8);
+
+        animatePathStep(previousState, currentState, '#00ffcc', 5);
+        animateTraversalStep(currentState, '#00ffcc', '#ffffff', true);
       }
 
+      // Inside the PDA termination block:
       delay += 800;
       setTimeout(() => {
         const finalState = finalRenderPath[finalRenderPath.length - 1];
-        const finalStateColor = acceptStateNames.includes(finalState) ? '#00ffcc' : '#ff3333';
+        const isAccepted = acceptStateNames.includes(finalState);
+        const finalStateColor = isAccepted ? '#00ffcc' : '#ff3333';
         nodesDataSet.update({ id: finalState, color: { background: finalStateColor, border: '#ffffff' } });
+
+        // Audio Trigger
+        isAccepted ? correctSound.play() : wrongSound.play();
       }, delay);
     }
   });
