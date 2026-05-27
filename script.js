@@ -281,41 +281,40 @@ document.addEventListener('DOMContentLoaded', () => {
   // PDA 1: REGEX OFF (a, b) - Transition Matrix
   const pdaOffTransitions = {
     'w1':  { 'a': ['REJ1'], 'b': ['w2'] },
-    'w2':  { 'a': ['w3'], 'b': ['w3'] },
+    'w2':  { 'a': ['w3'],   'b': ['w3'] },
     'w3':  { 'a': ['REJ2'], 'b': ['w4'] },
-    'w4':  { 'a': ['w7'], 'b': ['w5'] },
-    'w5':  { 'a': ['w6'], 'b': ['w5'] },
-    'w6':  { 'a': ['w6'], 'b': ['w8'] },
-    'w7':  { 'a': ['w7'], 'b': ['w9'] },
-    'w8':  { 'a': ['w11'], 'b': ['w10'] },
-    'w9':  { 'b': ['w4'], 'a': ['w11'] },
-    'w10': { 'a': ['REJ3']},
-    'w11': { 'a': ['w10'], 'b': ['w12'] },
-    'w12': { 'a': ['w13'], 'b': ['w14'] },
+    'w4':  { 'a': ['w7'],   'b': ['w5'] },
+    'w5':  { 'a': ['w6'],   'b': ['w5'] },
+    'w6':  { 'a': ['w6'],   'b': ['w8'] },
+    'w7':  { 'a': ['w7'],   'b': ['w9'] },
+    'w8':  { 'a': ['w11'],  'b': ['REJ5'] },
+    'w9':  { 'a': ['w11'],  'b': ['w5'] },
+    'w10': { 'a': ['REJ3'], 'b': ['w8'] },
+    'w11': { 'a': ['w10'],  'b': ['w12'] },
+    'w12': { 'a': ['w13'],  'b': ['w14'] },
     'w13': { 'a': ['REJ4'], 'b': ['w11'] },
-    'w14': { 'a': ['w15'], 'b': ['w17'] },
-    'w15': { 'a': ['w14'], 'b': ['w16'] },
+    'w14': { 'a': ['w15'],  'b': ['w17'] },
+    'w15': { 'a': ['w14'],  'b': ['w16'] },
     'w16': { 'a': ['ACC1'], 'b': ['w17'] },
-    'w17': { 'a': ['w18'], 'b': ['w17'] },
-    'w18': { 'a': ['w15'], 'b': ['ACC2'] },
-    'REJ1': {}, 'REJ2': {}, 'REJ3': {}, 'REJ4': {},
+    'w17': { 'a': ['w18'],  'b': ['w17'] },
+    'w18': { 'a': ['w15'],  'b': ['ACC2'] },
+    'REJ1': {}, 'REJ2': {}, 'REJ3': {}, 'REJ4': {}, 'REJ5': {},
     'ACC1': {}, 'ACC2': {}
   };
-
   // =====================================================================
   // PDA 2: REGEX ON (0, 1) - Transition Matrix
   // =====================================================================
-  const pdaOnTransitions = {
-    'y1': { '0': ['y4'], '1': ['y1', 'y2'] },
-    'y2': { '0': ['y3', 'y5'], '1': [] },
-    'y3': { '0': [], '1': ['y6'] },
-    'y4': { '0': ['y5'], '1': ['y6'] },
-    'y5': { '0': ['y6'], '1': ['y6'] },
-    'y6': { '0': ['y7'], '1': ['y8'] },
-    'y7': { '0': ['2ACC1'], '1': ['y8'] },
-    'y8': { '0': ['y10'], '1': ['y9'] },
-    'y9': { '0': ['y10'], '1': ['2ACC2'] },
-    'y10': { '0': ['2ACC3'], '1': ['2ACC3'] },
+const pdaOnTransitions = {
+    'y1':  { '0': ['y4'],       '1': ['y2'] },
+    'y2':  { '0': ['y3'], '1': ['y2'] },
+    'y3':  { '0': ['y5'],       '1': ['y6'] },
+    'y4':  { '0': ['y5'],       '1': ['y6'] },
+    'y5':  { '0': ['y6'],       '1': ['y6'] },
+    'y6':  { '0': ['y7'],       '1': ['y8'] },
+    'y7':  { '0': ['2ACC1'],    '1': ['y8'] },
+    'y8':  { '0': ['y10'],      '1': ['y9'] },
+    'y9':  { '0': ['y10'],      '1': ['2ACC2'] },
+    'y10': { '0': ['2ACC3'],    '1': ['2ACC3'] },
     '2ACC1': {}, '2ACC2': {}, '2ACC3': {}
   };
 
@@ -342,6 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'w9', label: 'READ9', shape: 'diamond', x: 0, y: 300 },
         { id: 'w10', label: 'READ10', shape: 'diamond', x: -150, y: 450 },
         { id: 'REJ3', label: 'REJECT', shape: 'ellipse', x: -300, y: 450, font: { color: '#ff3333' }, color: { border: '#ff3333' } },
+        { id: 'REJ5', label: 'REJECT', shape: 'ellipse', x: -300, y: 300, font: { color: '#ff3333' }, color: { border: '#ff3333' } },
         { id: 'w11', label: 'READ11', shape: 'diamond', x: 0, y: 450 },
         { id: 'w12', label: 'READ12', shape: 'diamond', x: 150, y: 450 },
         { id: 'w13', label: 'READ13', shape: 'diamond', x: 150, y: 300 },
@@ -370,27 +370,28 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: '1e12', from: 'w6', to: 'w8', label: 'b', smooth: false },
         { id: '1e13', from: 'w7', to: 'w7', label: 'a', smooth: loopSmooth },
         { id: '1e14', from: 'w7', to: 'w9', label: 'b', smooth: false },
-        { id: '1e16', from: 'w9', to: 'w4', label: 'b', smooth: { type: 'curvedCW', roundness: 0.3 } },
+        { id: '1e16', from: 'w9', to: 'w5', label: 'b', smooth: { type: 'curvedCCW', roundness: 0.2 } },
         { id: '1e17', from: 'w8', to: 'w11', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.3 } },
-        { id: '1e18', from: 'w8', to: 'w10', label: 'b', smooth: false },
-        { id: '1e19', from: 'w10', to: 'REJ3', label: 'a', smooth: false },
-        { id: '1e20', from: 'w11', to: 'w10', label: 'a', smooth: false },
-        { id: '1e21', from: 'w9', to: 'w11', label: 'a', smooth: false }, 
-        { id: '1e22', from: 'w11', to: 'w12', label: 'b', smooth: false },
-        { id: '1e23', from: 'w12', to: 'w13', label: 'a', smooth: false }, 
-        { id: '1e24', from: 'w13', to: 'REJ4', label: 'a', smooth: false }, 
-        { id: '1e25', from: 'w13', to: 'w11', label: 'b', smooth: { type: 'curvedCW', roundness: 0.4 } }, 
-        { id: '1e26', from: 'w12', to: 'w14', label: 'b', smooth: false },
-        { id: '1e27', from: 'w17', to: 'w17', label: 'b', smooth: loopSmooth },
-        { id: '1e28', from: 'w14', to: 'w15', label: 'a', smooth: false },
-        { id: '1e29', from: 'w15', to: 'w14', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.3 } }, 
-        { id: '1e30', from: 'w15', to: 'w16', label: 'b', smooth: false },
-        { id: '1e31', from: 'w16', to: 'ACC1', label: 'a', smooth: false },
-        { id: '1e32', from: 'w16', to: 'w17', label: 'b', smooth: { type: 'curvedCW', roundness: 0.3 } },
-        { id: '1e33', from: 'w14', to: 'w17', label: 'b', smooth: false }, 
-        { id: '1e34', from: 'w17', to: 'w18', label: 'a', smooth: false },
-        { id: '1e35', from: 'w18', to: 'w15', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.5 } }, 
-        { id: '1e36', from: 'w18', to: 'ACC2', label: 'b', smooth: false }
+        { id: '1e18', from: 'w10', to: 'w8', label: 'b', smooth: false },
+        { id: '1e19', from: 'w8', to: 'REJ5', label: 'b', smooth: false },
+        { id: '1e20', from: 'w10', to: 'REJ3', label: 'a', smooth: false },
+        { id: '1e21', from: 'w11', to: 'w10', label: 'a', smooth: false },
+        { id: '1e22', from: 'w9', to: 'w11', label: 'a', smooth: false }, 
+        { id: '1e23', from: 'w11', to: 'w12', label: 'b', smooth: false },
+        { id: '1e24', from: 'w12', to: 'w13', label: 'a', smooth: false }, 
+        { id: '1e25', from: 'w13', to: 'REJ4', label: 'a', smooth: false }, 
+        { id: '1e26', from: 'w13', to: 'w11', label: 'b', smooth: { type: 'curvedCW', roundness: 0.4 } }, 
+        { id: '1e27', from: 'w12', to: 'w14', label: 'b', smooth: false },
+        { id: '1e28', from: 'w17', to: 'w17', label: 'b', smooth: loopSmooth },
+        { id: '1e29', from: 'w14', to: 'w15', label: 'a', smooth: false },
+        { id: '1e30', from: 'w15', to: 'w14', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.3 } }, 
+        { id: '1e31', from: 'w15', to: 'w16', label: 'b', smooth: false },
+        { id: '1e32', from: 'w16', to: 'ACC1', label: 'a', smooth: false },
+        { id: '1e33', from: 'w16', to: 'w17', label: 'b', smooth: { type: 'curvedCW', roundness: 0.3 } },
+        { id: '1e34', from: 'w14', to: 'w17', label: 'b', smooth: false }, 
+        { id: '1e35', from: 'w17', to: 'w18', label: 'a', smooth: false },
+        { id: '1e36', from: 'w18', to: 'w15', label: 'a', smooth: { type: 'curvedCCW', roundness: 0.5 } }, 
+        { id: '1e37', from: 'w18', to: 'ACC2', label: 'b', smooth: false }
       ];
 
     } else {
@@ -414,11 +415,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       edgesArray = [
         { id: '2e1', from: 'Start2', to: 'y1', label: '', smooth: false },
-        { id: '2e2', from: 'y1', to: 'y1', label: '1', smooth: loopSmooth },
-        { id: '2e3', from: 'y1', to: 'y2', label: '1', smooth: false },
+        { id: '2e2', from: 'y1', to: 'y2', label: '1', smooth: false },
+        { id: '2e3', from: 'y2', to: 'y2', label: '1', smooth: loopSmooth },
         { id: '2e4', from: 'y1', to: 'y4', label: '0', smooth: false },
         { id: '2e5', from: 'y2', to: 'y3', label: '0', smooth: false },
-        { id: '2e6', from: 'y2', to: 'y5', label: '0', smooth: false },
+        { id: '2e6', from: 'y3', to: 'y5', label: '0', smooth: { type: 'curvedCW', roundness: 0.2 } },
         { id: '2e7', from: 'y3', to: 'y6', label: '1', smooth: { type: 'curvedCW', roundness: 0.2 } },
         { id: '2e8', from: 'y4', to: 'y5', label: '0', smooth: false },
         { id: '2e9', from: 'y4', to: 'y6', label: '1', smooth: { type: 'curvedCW', roundness: 0.3 } },
@@ -597,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentState = activeTransitions[currentState][char];
         
-        animatePathStep(previousState, currentState, '#00ffcc');
+        animatePathStep(previousState, currentState, '#00aa88');
         animateTraversalStep(currentState, '#00ffcc', '#ffffff');
       }
 
@@ -777,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         delay += 800; 
         
-        animatePathStep(previousState, currentState, '#00ffcc');
+        animatePathStep(previousState, currentState, '#00aa88');
         animateTraversalStep(currentState, '#00ffcc', '#ffffff');
       }
 
