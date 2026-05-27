@@ -535,14 +535,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Core Regex Validator Matrix ---
   validateBtn.addEventListener('click', () => {
-    const activeRegex = isRegexModeOn ? regexOnValidator : regexOffValidator;
     for (let i = 1; i <= 5; i++) {
       const inputVal = document.getElementById(`input-${i}`).value.trim();
       const light = document.getElementById(`input-${i}`).nextElementSibling;
       light.className = 'indicator-light';
 
       if (inputVal === "") continue;
-      light.classList.add(activeRegex.test(inputVal) ? 'valid' : 'invalid');
+
+      let isValid = false;
+
+      if (!isRegexModeOn) {
+        // Evaluate strictly through DFA 1 transition table
+        let currentState = 'Start';
+        for (let char of inputVal) {
+          if (dfaOffTransitions[currentState] && dfaOffTransitions[currentState][char]) {
+            currentState = dfaOffTransitions[currentState][char];
+          } else {
+            currentState = 'Trap1';
+            break;
+          }
+        }
+        // Accepts only if it lands safely in the final Accept state
+        isValid = (currentState === 'Accept');
+      } else {
+        // Evaluate strictly through DFA 2 transition table
+        let currentState = 'Start2';
+        for (let char of inputVal) {
+          if (dfaOnTransitions[currentState] && dfaOnTransitions[currentState][char]) {
+            currentState = dfaOnTransitions[currentState][char];
+          } else {
+            break;
+          }
+        }
+        // Accepts only if it lands safely in the final Accept2 state
+        isValid = (currentState === 'Accept2');
+      }
+
+      light.classList.add(isValid ? 'valid' : 'invalid');
     }
   });
 
@@ -599,9 +628,10 @@ document.addEventListener('DOMContentLoaded', () => {
         currentState = activeTransitions[currentState][char];
 
         animateTraversalStep(previousState, '#00332a', '#005544', false);
-        if (previousEdgeId) animatePathStep(previousState, currentState, '#005544', 8); 
+        if (previousEdgeId) animatePathStep(previousState, currentState, '#005544', 8);
+        delay += 500;
 
-        animatePathStep(previousState, currentState, '#00ffcc', 5); 
+        animatePathStep(previousState, currentState, '#00ffcc', 5);
         animateTraversalStep(currentState, '#00ffcc', '#ffffff', true);
       }
 
@@ -792,12 +822,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         animateTraversalStep(previousState, '#00332a', '#00aa88', false);
         if (previousEdgeId) animatePathStep(previousState, currentState, '#00aa88', 8);
+        delay += 500;
 
         animatePathStep(previousState, currentState, '#00ffcc', 5);
         animateTraversalStep(currentState, '#00ffcc', '#ffffff', true);
       }
 
-      // Inside the PDA termination block:
       delay += 800;
       setTimeout(() => {
         const finalState = finalRenderPath[finalRenderPath.length - 1];
